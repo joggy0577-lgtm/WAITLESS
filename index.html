@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Waitless — Real-time Clinic Token Tracking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#0a0c10; --bg2:#111318; --bg3:#1a1d24;
+      --border:rgba(255,255,255,0.08); --text:#f0f2f7; --muted:#7a7f91;
+      --green:#00e676; --red:#ff1744; --yellow:#ffd600; --blue:#40c4ff;
+      --font-display:'Syne',sans-serif; --font-body:'DM Sans',sans-serif; --radius:16px;
+    }
+    html,body { background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6; min-height:100vh; }
+    #root { min-height:100vh; }
+
+    /* ── NAV ── */
+    .nav { display:flex; align-items:center; justify-content:space-between; padding:16px 32px; border-bottom:1px solid var(--border); backdrop-filter:blur(12px); position:sticky; top:0; z-index:100; background:rgba(10,12,16,0.93); }
+    .nav-left { display:flex; align-items:center; gap:16px; }
+    .nav-brand { font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:-0.5px; background:linear-gradient(135deg,#fff 30%,var(--green)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .nav-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .nav-user { font-size:13px; color:var(--muted); max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .nav-right-note { font-size:13px; color:var(--green); font-weight:500; }
+
+    /* ── BUTTONS ── */
+    button { cursor:pointer; border:none; font-family:var(--font-body); font-size:14px; transition:all .18s; }
+    .btn-primary { background:var(--green); color:#000; font-weight:700; padding:10px 22px; border-radius:10px; }
+    .btn-primary:hover { background:#00ff87; transform:translateY(-1px); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-outline { background:transparent; color:var(--text); font-weight:600; padding:10px 22px; border-radius:10px; border:1.5px solid var(--border); }
+    .btn-outline:hover { border-color:var(--green); color:var(--green); }
+    .btn-ghost { background:transparent; color:var(--muted); padding:8px 14px; border-radius:8px; }
+    .btn-ghost:hover { color:var(--text); background:var(--bg3); }
+    .btn-google { display:inline-flex; align-items:center; gap:8px; background:#fff; color:#111; font-weight:600; padding:10px 18px; border-radius:10px; }
+    .btn-google:hover { background:#f0f0f0; transform:translateY(-1px); }
+    .btn-lg { padding:14px 32px; font-size:16px; border-radius:12px; }
+    .btn-red { background:rgba(255,23,68,0.12); color:var(--red); font-weight:700; padding:10px 20px; border-radius:10px; border:1px solid rgba(255,23,68,0.3); white-space:nowrap; }
+    .btn-red:hover { background:rgba(255,23,68,0.25); }
+
+    /* ── INPUTS ── */
+    label { display:flex; flex-direction:column; gap:8px; font-size:14px; font-weight:500; color:var(--muted); }
+    .inp { background:var(--bg3); border:1px solid var(--border); color:var(--text); border-radius:10px; padding:12px 16px; font-size:15px; font-family:var(--font-body); outline:none; transition:border-color .18s; width:100%; }
+    .inp:focus { border-color:var(--green); }
+    .inp::placeholder { color:#555; }
+
+    /* ── HERO ── */
+    .hero { text-align:center; padding:100px 24px 80px; background:radial-gradient(ellipse at 50% 0%,rgba(0,230,118,0.08) 0%,transparent 65%); }
+    .hero-pill { display:inline-block; padding:6px 18px; border-radius:100px; background:rgba(0,230,118,0.12); color:var(--green); font-size:13px; font-weight:600; letter-spacing:.5px; margin-bottom:24px; }
+    .hero-title { font-family:var(--font-display); font-size:clamp(48px,8vw,96px); font-weight:800; line-height:1; margin-bottom:24px; letter-spacing:-2px; }
+    .accent { color:var(--green); }
+    .hero-sub { font-size:18px; color:var(--muted); max-width:500px; margin:0 auto 40px; }
+    .hero-cta { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+
+    /* ── FEATURES ── */
+    .features { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:24px; padding:60px 32px; border-top:1px solid var(--border); max-width:1100px; margin:0 auto; }
+    .feature { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .feature-icon { font-size:32px; margin-bottom:12px; }
+    .feature h3 { font-family:var(--font-display); font-size:18px; margin-bottom:8px; }
+    .feature p { color:var(--muted); font-size:14px; }
+
+    /* ── CLINICS PREVIEW (home) ── */
+    .clinics-preview { padding:40px 32px; max-width:1100px; margin:0 auto; }
+    .section-title { font-family:var(--font-display); font-size:24px; margin-bottom:24px; font-weight:700; }
+    .clinic-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+    .clinic-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; cursor:pointer; transition:all .2s; border-top:3px solid var(--accent,var(--green)); }
+    .clinic-card:hover { transform:translateY(-3px); }
+    .clinic-card-status { display:inline-block; padding:4px 12px; border-radius:100px; font-size:12px; font-weight:600; margin-bottom:12px; }
+    .clinic-card-name { font-weight:600; font-size:16px; margin-bottom:2px; }
+    .clinic-card-title { color:var(--muted); font-size:14px; margin-bottom:16px; }
+    .clinic-card-token { display:flex; align-items:center; gap:12px; }
+    .token-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .token-num { font-family:var(--font-display); font-size:36px; font-weight:800; color:var(--accent,var(--green)); }
+
+    /* ── FOOTER ── */
+    .footer { display:flex; justify-content:space-between; align-items:center; padding:24px 32px; border-top:1px solid var(--border); color:var(--muted); font-size:13px; margin-top:20px; }
+
+    /* ── AVATAR ── */
+    .avatar { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+
+    /* ════════════════════════════════════════════════════
+       DOCTOR PANEL — TAB LAYOUT  (mobile-first)
+    ════════════════════════════════════════════════════ */
+    .doctor-panel { min-height:100vh; display:flex; flex-direction:column; }
+
+    /* Sticky tab bar */
+    .panel-tabs {
+      display:flex; border-bottom:1px solid var(--border);
+      background:var(--bg2); padding:0 16px;
+      position:sticky; top:57px; z-index:90;
+      overflow-x:auto; -webkit-overflow-scrolling:touch;
+    }
+    .panel-tab {
+      padding:14px 16px; font-family:var(--font-display); font-size:13px;
+      font-weight:700; color:var(--muted); border-bottom:3px solid transparent;
+      cursor:pointer; background:transparent; letter-spacing:.3px;
+      transition:all .18s; white-space:nowrap; flex-shrink:0;
+    }
+    .panel-tab:hover { color:var(--text); }
+    .panel-tab.active { color:var(--green); border-bottom-color:var(--green); }
+    .tab-badge {
+      display:inline-flex; align-items:center; justify-content:center;
+      background:var(--green); color:#000; font-size:10px; font-weight:800;
+      width:18px; height:18px; border-radius:50%; margin-left:6px; vertical-align:middle;
+    }
+    .tab-content { display:none; flex:1; }
+    .tab-content.active { display:block; }
+
+    /* ── TAB 1: My Session ── */
+    .my-session-body { max-width:640px; margin:0 auto; padding:28px 16px 80px; }
+    .my-session-heading { font-family:var(--font-display); font-size:24px; font-weight:800; margin-bottom:6px; }
+    .my-session-sub { color:var(--muted); font-size:14px; margin-bottom:24px; }
+
+    .create-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px 20px; }
+    .create-card h3 { font-family:var(--font-display); font-size:18px; margin-bottom:6px; }
+    .create-sub { color:var(--muted); font-size:13px; margin-bottom:22px; }
+    .form-grid { display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:22px; }
+    .create-btn { width:100%; display:block; text-align:center; }
+
+    /* Active session summary */
+    .active-session-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px; display:flex; flex-direction:column; gap:16px;
+    }
+    .asc-left { flex:1; }
+    .asc-label { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:4px; }
+    .asc-title { font-family:var(--font-display); font-size:20px; font-weight:700; margin-bottom:6px; }
+    .asc-meta { font-size:13px; color:var(--muted); margin-bottom:10px; }
+    .asc-token { text-align:center; background:var(--bg3); border-radius:12px; padding:14px 20px; align-self:flex-start; }
+    .asc-token-label { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+    .asc-token-num { font-family:var(--font-display); font-size:44px; font-weight:800; line-height:1; }
+    .asc-token-of { font-size:12px; color:var(--muted); margin-top:2px; }
+    .asc-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-go-operate {
+      flex:1; background:var(--green); color:#000; font-weight:800;
+      padding:12px 16px; border-radius:12px; font-size:14px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .btn-go-operate:hover { background:#00ff87; }
+    .broadcast-preview {
+      background:rgba(255,214,0,0.07); border:1px solid rgba(255,214,0,0.18);
+      border-radius:12px; padding:12px 16px; font-size:14px; color:#ffe082;
+      display:flex; gap:10px; align-items:flex-start; word-break:break-word;
+    }
+
+    /* ════════════════════════════════════════════════════
+       TAB 2: OPERATING APPOINTMENTS  (mobile-first)
+    ════════════════════════════════════════════════════ */
+    .op-body {
+      max-width:640px; margin:0 auto;
+      padding:20px 16px 80px;
+      display:flex; flex-direction:column; gap:16px;
+    }
+
+    /* Top info bar */
+    .op-topbar {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:16px 18px; gap:12px;
+    }
+    .op-topbar-info { flex:1; min-width:0; }
+    .op-session-name {
+      font-family:var(--font-display); font-size:17px; font-weight:700;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .op-session-meta { font-size:12px; color:var(--muted); margin-top:2px; }
+    .op-live-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 12px; border-radius:100px; font-size:12px; font-weight:700;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .op-live-dot { width:6px; height:6px; border-radius:50%; animation:pulse-anim 1.5s infinite; flex-shrink:0; }
+
+    /* Token hero — holds number AND nav buttons */
+    .op-token-hero {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:28px 20px 24px;
+      text-align:center; position:relative; overflow:hidden;
+    }
+    .op-token-hero::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at 50% 0%,rgba(0,230,118,0.06) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .op-token-eyebrow {
+      font-size:11px; text-transform:uppercase; letter-spacing:2px;
+      color:var(--muted); margin-bottom:8px;
+    }
+    .op-token-num {
+      font-family:var(--font-display);
+      font-size:clamp(72px,22vw,120px);
+      font-weight:800; line-height:1; transition:color .3s;
+    }
+    .op-token-denom { color:var(--muted); font-size:14px; margin:8px 0 18px; }
+    .op-progress-track {
+      height:7px; background:var(--bg3); border-radius:4px;
+      overflow:hidden; max-width:320px; margin:0 auto 8px;
+    }
+    .op-progress-fill { height:100%; border-radius:4px; transition:width .5s ease; }
+    .op-progress-pct { font-size:12px; color:var(--muted); }
+
+    /* Token nav — inside the hero card */
+    .op-token-nav { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .op-nav-btn {
+      padding:16px 12px; border-radius:12px; font-weight:800; font-size:15px;
+      border:2px solid var(--border); background:var(--bg3); color:var(--text);
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:all .18s;
+    }
+    .op-nav-btn:hover:not(:disabled) { border-color:var(--green); color:var(--green); }
+    .op-nav-btn:disabled { opacity:.3; cursor:not-allowed; }
+    .op-nav-next { border-color:rgba(0,230,118,0.4); color:var(--green); background:rgba(0,230,118,0.04); }
+
+    /* Cooldown timer */
+    .token-cooldown-row {
+      display:none; align-items:center; justify-content:center; gap:8px;
+      background:rgba(255,214,0,0.07); border:1px solid rgba(255,214,0,0.2);
+      border-radius:10px; padding:10px 16px; font-size:14px; color:#ffe082;
+    }
+    .cd-icon { font-size:16px; }
+    .token-cooldown-row strong { font-family:var(--font-display); font-size:16px; }
+
+    /* Section labels */
+    .op-section-label {
+      font-family:var(--font-display); font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:12px;
+    }
+
+    /* Main control panel */
+    .op-control-panel {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:20px 18px;
+    }
+    .op-ctrl-section-label {
+      font-family:var(--font-display); font-size:11px; font-weight:700;
+      text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:12px;
+    }
+
+    /* 2-col on mobile, stays 2-col */
+    .op-main-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    .op-ctrl-btn {
+      display:flex; align-items:center; gap:10px;
+      padding:14px 12px; border-radius:12px;
+      border:2px solid var(--border); background:rgba(255,255,255,0.03);
+      color:var(--text); text-align:left; transition:all .18s;
+      cursor:pointer; font-family:var(--font-body);
+    }
+    .op-ctrl-btn:hover:not(:disabled) { transform:translateY(-1px); opacity:.9; }
+    .op-ctrl-btn:disabled { opacity:.3; cursor:not-allowed; }
+    .op-ctrl-icon { font-size:20px; flex-shrink:0; }
+    .op-ctrl-text { display:flex; flex-direction:column; min-width:0; }
+    .op-ctrl-name { font-size:14px; font-weight:800; line-height:1.2; }
+    .op-ctrl-desc { font-size:11px; color:var(--muted); margin-top:2px; font-weight:400; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    .op-ctrl-start     { border-color:rgba(0,230,118,0.5); background:rgba(0,230,118,0.05); }
+    .op-ctrl-start .op-ctrl-name { color:var(--green); }
+    .op-ctrl-stop      { border-color:rgba(64,196,255,0.4); }
+    .op-ctrl-stop .op-ctrl-name { color:var(--blue); }
+    .op-ctrl-emergency { border-color:rgba(255,23,68,0.35); }
+    .op-ctrl-emergency .op-ctrl-name { color:var(--red); }
+    .op-ctrl-nopat     { border-color:rgba(255,214,0,0.35); }
+    .op-ctrl-nopat .op-ctrl-name { color:var(--yellow); }
+    .op-ctrl-end       { border-color:rgba(255,23,68,0.25); }
+    .op-ctrl-end .op-ctrl-name { color:var(--red); }
+    .op-ctrl-active    { background:rgba(128,128,128,0.1); }
+
+    /* Emergency / stopped banners */
+    .op-continue-banner {
+      background:rgba(0,230,118,0.07); border:2px solid var(--green);
+      border-radius:12px; padding:16px; display:flex;
+      align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .op-continue-title { font-weight:700; font-size:14px; color:var(--green); }
+    .op-continue-desc  { font-size:12px; color:var(--muted); margin-top:2px; }
+    .btn-continue-op {
+      background:var(--green); color:#000; font-weight:800;
+      padding:11px 20px; border-radius:10px; font-size:13px; white-space:nowrap;
+    }
+    .btn-continue-op:hover { background:#00ff87; }
+    .op-stopped-banner {
+      background:rgba(64,196,255,0.07); border:1.5px solid rgba(64,196,255,0.3);
+      border-radius:12px; padding:14px 16px;
+    }
+    .op-stopped-text { font-weight:700; font-size:14px; color:var(--blue); margin-bottom:3px; }
+    .op-stopped-desc { font-size:12px; color:var(--muted); }
+
+    /* Instruction box */
+    .op-instr-box {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:20px 18px;
+    }
+    .op-instr-row { display:flex; gap:10px; }
+    .op-instr-row .inp { flex:1; width:auto; }
+    .op-current-instr {
+      margin-top:12px; padding:10px 14px;
+      background:rgba(255,214,0,0.06); border:1px solid rgba(255,214,0,0.15);
+      border-radius:10px; font-size:13px; color:#ffe082;
+      display:flex; gap:8px; align-items:flex-start; word-break:break-word;
+    }
+
+    /* Danger zone */
+    .op-danger {
+      background:rgba(255,23,68,0.04); border:1px solid rgba(255,23,68,0.18);
+      border-radius:var(--radius); padding:18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .op-danger h4 { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--red); margin-bottom:3px; }
+    .op-danger p  { font-size:12px; color:var(--muted); }
+
+    /* No session placeholder */
+    .op-empty { text-align:center; padding:60px 20px; }
+    .op-empty-icon { font-size:52px; margin-bottom:14px; }
+    .op-empty h3 { font-family:var(--font-display); font-size:20px; margin-bottom:8px; }
+    .op-empty p  { color:var(--muted); font-size:14px; margin-bottom:20px; }
+
+    /* Debug row */
+    .op-debug-row {
+      display:flex; align-items:center; gap:8px;
+      background:var(--bg3); border-radius:10px;
+      padding:8px 14px; font-size:12px; flex-wrap:wrap;
+    }
+    .op-debug-label { color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .op-debug-val { color:var(--text); font-family:monospace; font-size:11px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+    .op-debug-test { background:var(--bg2); color:var(--muted); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:11px; flex-shrink:0; }
+    .op-debug-test:hover { color:var(--green); border-color:var(--green); }
+
+    /* ════════════════════════════════════════════════════
+       TAB 3: MY APPOINTMENTS HISTORY
+    ════════════════════════════════════════════════════ */
+    .hist-body { max-width:640px; margin:0 auto; padding:28px 16px 80px; }
+    .hist-heading { font-family:var(--font-display); font-size:24px; font-weight:800; margin-bottom:6px; }
+    .hist-sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+    .hist-list { display:flex; flex-direction:column; gap:14px; }
+    .hist-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; transition:all .2s; }
+    .hist-card-active { border-left:4px solid var(--green); }
+    .hist-card-ended  { border-left:4px solid var(--bg3); opacity:.8; }
+    .hist-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    .hist-card-title { font-family:var(--font-display); font-size:16px; font-weight:700; margin-bottom:3px; }
+    .hist-card-meta  { font-size:12px; color:var(--muted); }
+    .hist-badge-active { background:rgba(0,230,118,0.12); color:var(--green); padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+    .hist-badge-ended  { background:var(--bg3); color:var(--muted); padding:4px 12px; border-radius:100px; font-size:12px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+    .hist-card-stats { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:14px; }
+    .hist-stat { text-align:center; }
+    .hist-stat-val { font-family:var(--font-display); font-size:24px; font-weight:800; line-height:1; }
+    .hist-stat-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:3px; }
+    .hist-card-actions { padding-top:12px; border-top:1px solid var(--border); }
+
+    /* ── NOT STARTED / START SERVING BANNER ── */
+    .op-start-banner {
+      background:rgba(158,158,158,0.07); border:2px solid rgba(158,158,158,0.3);
+      border-radius:var(--radius); padding:20px;
+      display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    }
+    .op-start-title { font-family:var(--font-display); font-size:16px; font-weight:700; margin-bottom:4px; }
+    .op-start-desc  { font-size:12px; color:var(--muted); }
+    .btn-start-serving {
+      background:var(--green); color:#000; font-weight:800;
+      padding:14px 28px; border-radius:12px; font-size:15px; white-space:nowrap;
+      box-shadow:0 4px 20px rgba(0,230,118,0.25); transition:all .2s; flex-shrink:0;
+    }
+    .btn-start-serving:hover { background:#00ff87; transform:translateY(-1px); }
+
+    /* ════════════════════════════════════════════════════
+       PUBLIC BOARD
+    ════════════════════════════════════════════════════ */    /* ════════════════════════════════════════════════════
+       PUBLIC BOARD
+    ════════════════════════════════════════════════════ */
+    .public-board { min-height:100vh; }
+    .board-body { max-width:1000px; margin:0 auto; padding:48px 24px; }
+    .board-title { font-family:var(--font-display); font-size:32px; font-weight:800; margin-bottom:24px; }
+
+    /* Search */
+    .search-wrap { position:relative; margin-bottom:28px; }
+    .search-icon-el { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+    .search-inp { width:100%; background:var(--bg2); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:14px 44px; font-size:15px; font-family:var(--font-body); outline:none; transition:border-color .18s; }
+    .search-inp:focus { border-color:var(--green); }
+    .search-inp::placeholder { color:#555; }
+    .search-clear { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:var(--bg3); border:none; color:var(--muted); width:26px; height:26px; border-radius:50%; font-size:14px; cursor:pointer; display:none; align-items:center; justify-content:center; }
+    .search-clear.show { display:flex; }
+
+    /* Pub cards */
+    .board-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .pub-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; overflow:hidden; transition:all .2s; border-left:4px solid var(--accent,var(--green)); }
+    .pub-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+    .pub-card-inner { display:flex; align-items:center; gap:16px; padding:24px; }
+    .pub-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+    .pub-info { flex:1; min-width:0; }
+    .pub-doctor { font-weight:700; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pub-title-txt { color:var(--muted); font-size:13px; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pub-status-lbl { font-size:13px; font-weight:600; }
+    .pub-token-badge { text-align:center; flex-shrink:0; }
+    .pub-token-n { font-family:var(--font-display); font-size:48px; font-weight:800; line-height:1; }
+    .pub-token-l { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+    .pub-card-foot { padding:10px 24px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); text-align:right; }
+
+    /* Empty state */
+    .empty-state { text-align:center; padding:80px 24px; }
+    .empty-icon { font-size:64px; margin-bottom:20px; }
+    .empty-state p { font-size:20px; font-weight:600; margin-bottom:8px; }
+    .empty-state span { color:var(--muted); font-size:15px; display:block; }
+
+    /* ════════════════════════════════════════════════════
+       LIVE TOKEN VIEW
+    ════════════════════════════════════════════════════ */
+    .live-view { max-width:600px; margin:0 auto; padding:32px 24px; }
+    .live-card { background:var(--bg2); border:1px solid var(--border); border-radius:24px; padding:36px 28px; display:flex; flex-direction:column; gap:24px; }
+    .live-dr-row { display:flex; align-items:center; gap:16px; }
+    .live-avatar { width:52px; height:52px; border-radius:50%; object-fit:cover; }
+    .live-dr-name { font-family:var(--font-display); font-size:20px; font-weight:700; }
+    .live-session-lbl { color:var(--muted); font-size:14px; }
+    .live-status-banner { display:flex; align-items:center; gap:12px; padding:14px 20px; border-radius:12px; font-size:15px; flex-wrap:wrap; }
+    .live-status-icon { font-size:20px; flex-shrink:0; }
+    .blink { animation:blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+    .live-token-main { text-align:center; padding:16px 0; }
+    .live-token-eyebrow { font-size:13px; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:8px; }
+    .live-token-number { font-family:var(--font-display); font-size:clamp(80px,22vw,130px); font-weight:800; line-height:1; }
+    .live-token-of { color:var(--muted); font-size:16px; margin-top:8px; }
+    .progress-bar { height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:3px; transition:width .6s ease; }
+    .progress-lbl { font-size:12px; color:var(--muted); margin-top:8px; text-align:right; }
+    .live-instr { display:flex; align-items:flex-start; gap:12px; background:rgba(255,214,0,0.08); border:1px solid rgba(255,214,0,0.2); border-radius:12px; padding:16px; font-size:15px; color:#ffe082; word-break:break-word; }
+    .inst-icon { font-size:20px; flex-shrink:0; }
+    .live-meta { font-size:13px; color:var(--muted); text-align:center; }
+    .live-pulse-note { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); justify-content:center; }
+    .pulse-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; animation:pulse-anim 2s infinite; }
+    @keyframes pulse-anim { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)} }
+
+    /* Share row */
+    .share-row { display:flex; gap:10px; }
+    .btn-share, .btn-copy { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; background:var(--bg3); color:var(--text); font-weight:600; padding:13px; border-radius:12px; border:1.5px solid var(--border); font-size:14px; }
+    .btn-share:hover { border-color:var(--green); color:var(--green); }
+    .btn-copy:hover  { border-color:var(--blue);  color:var(--blue);  }
+
+    /* ── MAIN CONTROL PANEL ── */
+    .op-control-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .op-ctrl-section-label { font-family:var(--font-display); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:14px; }
+
+    /* Control buttons grid */
+    .op-main-controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:560px){ .op-main-controls{ grid-template-columns:1fr; } }
+
+    .op-ctrl-btn {
+      display:flex; align-items:center; gap:14px;
+      padding:18px 16px; border-radius:14px;
+      border:2px solid var(--border); background:rgba(255,255,255,0.03);
+      color:var(--text); text-align:left; transition:all .18s; cursor:pointer; font-family:var(--font-body);
+    }
+    .op-ctrl-btn:hover:not(:disabled) { transform:translateY(-1px); opacity:.9; }
+    .op-ctrl-btn:disabled { opacity:.3; cursor:not-allowed; }
+    .op-ctrl-icon { font-size:26px; flex-shrink:0; }
+    .op-ctrl-text { display:flex; flex-direction:column; }
+    .op-ctrl-name { font-size:16px; font-weight:800; line-height:1.2; }
+    .op-ctrl-desc { font-size:12px; color:var(--muted); margin-top:2px; font-weight:400; }
+
+    /* Individual button styles */
+    .op-ctrl-start    { border-color:rgba(0,230,118,0.5); background:rgba(0,230,118,0.05); }
+    .op-ctrl-start .op-ctrl-name { color:var(--green); }
+    .op-ctrl-start:hover { background:rgba(0,230,118,0.1); border-color:var(--green); }
+
+    .op-ctrl-stop     { border-color:rgba(64,196,255,0.4); }
+    .op-ctrl-stop .op-ctrl-name { color:var(--blue); }
+    .op-ctrl-stop:hover { background:rgba(64,196,255,0.08); border-color:var(--blue); }
+
+    .op-ctrl-emergency { border-color:rgba(255,23,68,0.35); }
+    .op-ctrl-emergency .op-ctrl-name { color:var(--red); }
+    .op-ctrl-emergency:hover { background:rgba(255,23,68,0.08); border-color:var(--red); }
+
+    .op-ctrl-nopat    { border-color:rgba(255,214,0,0.35); }
+    .op-ctrl-nopat .op-ctrl-name { color:var(--yellow); }
+    .op-ctrl-nopat:hover { background:rgba(255,214,0,0.08); border-color:var(--yellow); }
+
+    .op-ctrl-end      { border-color:rgba(255,23,68,0.25); }
+    .op-ctrl-end .op-ctrl-name { color:var(--red); }
+    .op-ctrl-end:hover { background:rgba(255,23,68,0.08); border-color:var(--red); }
+
+    /* Active state — when button is currently selected */
+    .op-ctrl-active { background:rgba(128,128,128,0.1); }
+
+    /* Stopped banner */
+    .op-stopped-banner { background:rgba(64,196,255,0.07); border:1.5px solid rgba(64,196,255,0.3); border-radius:12px; padding:16px 20px; }
+    .op-stopped-text { font-weight:700; font-size:15px; color:var(--blue); margin-bottom:4px; }
+    .op-stopped-desc { font-size:13px; color:var(--muted); }
+
+    /* ── NOT STARTED / START SERVING BANNER ── */
+    .op-start-banner {
+      background:rgba(158,158,158,0.07); border:2px solid rgba(158,158,158,0.3);
+      border-radius:var(--radius); padding:24px 28px;
+      display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+    }
+    .op-start-title { font-family:var(--font-display); font-size:18px; font-weight:700; margin-bottom:6px; color:var(--text); }
+    .op-start-desc  { font-size:13px; color:var(--muted); max-width:380px; }
+    .btn-start-serving {
+      background:var(--green); color:#000; font-weight:800;
+      padding:16px 32px; border-radius:14px; font-size:16px;
+      white-space:nowrap; flex-shrink:0;
+      box-shadow:0 6px 24px rgba(0,230,118,0.3);
+      transition:all .2s;
+    }
+    .btn-start-serving:hover { background:#00ff87; transform:translateY(-2px); box-shadow:0 10px 32px rgba(0,230,118,0.45); }
+
+    /* ── MY APPOINTMENTS HISTORY TAB ── */
+    .hist-body { max-width:800px; margin:0 auto; padding:40px 24px 80px; }
+    .hist-heading { font-family:var(--font-display); font-size:28px; font-weight:800; margin-bottom:8px; }
+    .hist-sub { color:var(--muted); font-size:14px; margin-bottom:32px; }
+    .hist-list { display:flex; flex-direction:column; gap:16px; }
+
+    .hist-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:24px; transition:all .2s; }
+    .hist-card-active { border-left:4px solid var(--green); }
+    .hist-card-ended  { border-left:4px solid var(--bg3); opacity:.85; }
+
+    .hist-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+    .hist-card-title { font-family:var(--font-display); font-size:18px; font-weight:700; margin-bottom:4px; }
+    .hist-card-meta  { font-size:13px; color:var(--muted); }
+
+    .hist-badge-active { background:rgba(0,230,118,0.12); color:var(--green); padding:5px 14px; border-radius:100px; font-size:13px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+    .hist-badge-ended  { background:var(--bg3); color:var(--muted); padding:5px 14px; border-radius:100px; font-size:13px; font-weight:600; white-space:nowrap; flex-shrink:0; }
+
+    .hist-card-stats { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:16px; }
+    .hist-stat { text-align:center; }
+    .hist-stat-val { font-family:var(--font-display); font-size:28px; font-weight:800; line-height:1; }
+    .hist-stat-lbl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:4px; }
+
+    .hist-card-actions { padding-top:16px; border-top:1px solid var(--border); }
+    .hist-loading { text-align:center; padding:60px 24px; color:var(--muted); }
+    .hist-loader { width:36px; height:36px; border:3px solid var(--bg3); border-top-color:var(--green); border-radius:50%; animation:spin .7s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to{ transform:rotate(360deg); } }
+
+    /* ── DEBUG ROW ── */
+    .op-debug-row { display:flex; align-items:center; gap:10px; background:var(--bg3); border-radius:10px; padding:10px 16px; font-size:12px; flex-wrap:wrap; }
+    .op-debug-label { color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .op-debug-val { color:var(--text); font-family:monospace; font-size:11px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .op-debug-test { background:var(--bg2); color:var(--muted); border:1px solid var(--border); padding:5px 12px; border-radius:8px; font-size:12px; flex-shrink:0; }
+    .op-debug-test:hover { color:var(--green); border-color:var(--green); }
+
+    /* ── TOKEN COOLDOWN ── */
+    .token-cooldown-row {
+      align-items:center; gap:10px; margin-top:12px;
+      background:rgba(255,214,0,0.07); border:1px solid rgba(255,214,0,0.2);
+      border-radius:10px; padding:10px 18px; font-size:14px; color:#ffe082;
+      animation: fadeup .2s ease;
+    }
+    .cd-icon { font-size:18px; }
+    .token-cooldown-row strong { font-family:var(--font-display); font-size:16px; }
+
+    /* ── SPLASH ── */
+    .splash { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; gap:16px; }
+    .splash-logo { width:72px; height:72px; border-radius:20px; background:var(--green); color:#000; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:36px; font-weight:800; }
+    .splash p { color:var(--muted); font-size:16px; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--bg2); border:1px solid var(--border); color:var(--text); padding:12px 24px; border-radius:12px; font-size:14px; z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,0.5); animation:fadeup .3s ease; pointer-events:none; white-space:nowrap; }
+    @keyframes fadeup { from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet: 2-col form grid */
+    @media(min-width:520px){
+      .form-grid { grid-template-columns:1fr 1fr; }
+    }
+
+    /* Tablet: wider padding */
+    @media(min-width:600px){
+      .op-body,.my-session-body,.hist-body { padding-left:24px; padding-right:24px; }
+      .active-session-card { flex-direction:row; align-items:center; }
+    }
+
+    /* Small mobile tweaks */
+    @media(max-width:400px){
+      .op-main-controls { grid-template-columns:1fr; }
+      .op-ctrl-desc { display:none; }
+      .panel-tab { padding:12px 12px; font-size:12px; }
+    }
+
+    /* General small screen */
+    @media(max-width:540px){
+      .nav { padding:12px 16px; }
+      .hero { padding:56px 16px 44px; }
+      .features,.clinics-preview,.board-body { padding-left:16px; padding-right:16px; }
+      .footer { flex-direction:column; gap:6px; text-align:center; padding:16px; }
+      .live-card { padding:20px 16px; }
+      .share-row { flex-direction:column; }
+      .asc-actions { flex-direction:row; }
+      .btn-go-operate { font-size:13px; }
+      .op-instr-row { flex-direction:column; }
+      .op-instr-row .inp { width:100%; }
+      .op-continue-banner { flex-direction:column; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+  window.addEventListener("DOMContentLoaded", function () {
+
+    /* ── Firebase Config ─────────────────────────────── */
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBxyZM9hNKDgZ9ZiKmTqVLjy1PA3m0KH24",
+      authDomain:        "waitless-26f3c.firebaseapp.com",
+      databaseURL:       "https://waitless-26f3c-default-rtdb.firebaseio.com",
+      projectId:         "waitless-26f3c",
+      storageBucket:     "waitless-26f3c.firebasestorage.app",
+      messagingSenderId: "462985909194",
+      appId:             "1:462985909194:web:c740777f907f5a6be0f533"
+    };
+    const BACKEND = "https://waitless-backend-7bv4.onrender.com";
+
+    firebase.initializeApp(firebaseConfig);
+    const auth     = firebase.auth();
+    const db       = firebase.firestore();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    /* ── App State ───────────────────────────────────── */
+    let currentUser     = null;
+    let currentView     = "splash";
+    let allAppointments = [];
+    let myAppointment   = null;
+    let selectedApt     = null;
+    let aptUnsub        = null;
+    let searchQuery     = "";
+    let activeTab       = "my-session"; // "my-session" | "operating" | "history"
+    let myAllAppointments = []; // all appointments by this doctor (active + past)
+
+    const STATUS = {
+      normal:    { label:"Serving Patients", color:"#00e676", icon:"🟢", desc:"Queue running normally"   },
+      emergency: { label:"Emergency Stop",   color:"#ff1744", icon:"🔴", desc:"Pause queue immediately"  },
+      nopatient: { label:"No Patients",      color:"#ffd600", icon:"🟡", desc:"Queue is currently empty" },
+      break:     { label:"Break / Away",     color:"#40c4ff", icon:"🔵", desc:"Doctor stepped away"      },
+    };
+
+    /* ── Router ──────────────────────────────────────── */
+    function go(view, data) {
+      currentView = view;
+      if (data !== undefined) selectedApt = data;
+      if (view !== "public") searchQuery = "";
+      paint();
+    }
+
+    function paint() {
+      const root = document.getElementById("root");
+      switch (currentView) {
+        case "splash": root.innerHTML = splashHTML();                break;
+        case "home":   root.innerHTML = homeHTML();   bindHome();   break;
+        case "doctor": root.innerHTML = doctorHTML(); bindDoctor(); break;
+        case "public": root.innerHTML = publicHTML(); bindPublic(); break;
+        case "live":   root.innerHTML = liveHTML();   bindLive();   break;
+      }
+    }
+
+    /* ── Toast ───────────────────────────────────────── */
+    function toast(msg, ms) {
+      ms = ms || 2800;
+      var old = document.querySelector(".toast");
+      if (old) old.remove();
+      var t = document.createElement("div");
+      t.className = "toast";
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, ms);
+    }
+
+    /* ── Auth ────────────────────────────────────────── */
+    async function login() {
+      try { await auth.signInWithPopup(provider); }
+      catch(e) { toast("Login failed: " + e.message); }
+    }
+    async function logout() {
+      await auth.signOut();
+      myAppointment = null;
+      myAllAppointments = [];
+      activeTab = "my-session";
+      if (histUnsub) { histUnsub(); histUnsub = null; }
+      go("home");
+    }
+
+    /* ── Global Firestore listener (all active apts) ─── */
+    db.collection("appointments").where("active","==",true)
+      .onSnapshot(function(snap) {
+        allAppointments = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+
+        if (currentView === "live" && selectedApt) {
+          var up = allAppointments.find(function(a){ return a.id === selectedApt.id; });
+          if (up) { selectedApt = up; patchLive(); }
+          else    { go("public"); }
+        }
+        if (currentView === "home") {
+          var el = eid("preview-section");
+          if (el) { el.outerHTML = previewSectionHTML(); reBindClinicCards(); }
+        }
+        if (currentView === "public") {
+          var el2 = eid("board-grid");
+          if (el2) { el2.innerHTML = pubCardsInner(); reBindPubCards(); }
+        }
+      }, function(err){ console.error(err); });
+
+    /* ── Doctor session listener ─────────────────────── */
+    var histUnsub = null;
+    function startDoctorWatch(uid) {
+      if (aptUnsub) aptUnsub();
+      if (histUnsub) histUnsub();
+
+      // Active session listener
+      aptUnsub = db.collection("appointments")
+        .where("doctorId","==",uid).where("active","==",true)
+        .onSnapshot(function(snap) {
+          myAppointment = snap.empty
+            ? null
+            : Object.assign({id:snap.docs[0].id}, snap.docs[0].data());
+          if (currentView === "doctor") patchDoctorTabs();
+        }, function(err){ console.error(err); });
+
+      // All appointments listener (active + past) for history tab
+      histUnsub = db.collection("appointments")
+        .where("doctorId","==",uid)
+        .orderBy("createdAt","desc")
+        .onSnapshot(function(snap) {
+          myAllAppointments = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          histLoaded = true;
+          if (currentView === "doctor" && activeTab === "history") {
+            var tc3 = eid("tc-history");
+            if (tc3) { tc3.innerHTML = historyTabHTML(); bindHistoryContent(); }
+          }
+        }, function(err){
+          // createdAt index may not exist yet — fallback without ordering
+          histUnsub = db.collection("appointments")
+            .where("doctorId","==",uid)
+            .onSnapshot(function(snap2) {
+              myAllAppointments = snap2.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); })
+                .sort(function(a,b){ return ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0); });
+              histLoaded = true;
+              if (currentView === "doctor" && activeTab === "history") {
+                var tc3b = eid("tc-history");
+                if (tc3b) { tc3b.innerHTML = historyTabHTML(); bindHistoryContent(); }
+              }
+            });
+        });
+    }
+
+    /* ── API helper ──────────────────────────────────── */
+    async function api(method, path, body) {
+      var token = null;
+      try {
+        token = currentUser ? await currentUser.getIdToken(true) : null;
+      } catch(tokenErr) {
+        throw new Error("Auth token error: " + tokenErr.message);
+      }
+
+      var res;
+      try {
+        res = await fetch(BACKEND + path, {
+          method: method,
+          headers: Object.assign(
+            {"Content-Type":"application/json"},
+            token ? {Authorization:"Bearer "+token} : {}
+          ),
+          body: body ? JSON.stringify(body) : undefined,
+        });
+      } catch(networkErr) {
+        throw new Error("Network error — backend unreachable: " + networkErr.message);
+      }
+
+      if (!res.ok) {
+        var errText = await res.text().catch(function(){ return res.statusText; });
+        var errMsg = errText;
+        try { errMsg = JSON.parse(errText).error || errText; } catch(e) {}
+        console.error("API Error", method, path, res.status, errMsg);
+        throw new Error("(" + res.status + ") " + errMsg);
+      }
+      return res.json();
+    }
+
+    /* ── Actions ─────────────────────────────────────── */
+    async function createAppointment() {
+      var title  = val("f-title").trim();
+      var sched  = val("f-start");
+      var tokens = Math.min(Math.max(parseInt(val("f-tokens"))||20, 1), 500);
+      var notes  = val("f-notes").trim();
+      if (!title) { toast("Please enter a session title."); return; }
+
+      var btn = eid("create-btn");
+      btn.disabled = true;
+      btn.textContent = "Starting…";
+
+      try {
+        var created = await api("POST", "/api/appointments", {
+          title: title, startTime: sched, totalTokens: tokens, notes: notes
+        });
+
+        // Immediately populate myAppointment from the API response
+        // so the operating tab renders right away without waiting for Firestore
+        myAppointment = {
+          id:           created.id,
+          doctorId:     currentUser.uid,
+          doctorName:   currentUser.displayName || "Doctor",
+          doctorPhoto:  currentUser.photoURL || "",
+          title:        title,
+          startTime:    sched,
+          totalTokens:  tokens,
+          currentToken: 1,
+          status:       "notstarted",
+          instruction:  "",
+          active:       true,
+          notes:        notes,
+        };
+
+        activeTab = "operating";
+        paint();
+        toast("✅ Session started!");
+      } catch(e) {
+        toast("❌ " + e.message);
+        btn.disabled = false;
+        btn.textContent = "🚀 Start Appointment Session";
+      }
+    }
+
+    // ── Optimistic update: update UI instantly, sync to Firestore in background ──
+    // This makes all buttons feel instant (0ms) instead of waiting 2-3s for Firestore
+    function optimistic(fields) {
+      if (!myAppointment) return;
+
+      // 1. Apply change to local state immediately
+      Object.assign(myAppointment, fields);
+
+      // 2. Re-render the operating tab right now — no waiting
+      patchDoctorTabs();
+
+      // 3. Write to Firestore in the background (no await)
+      db.collection("appointments").doc(myAppointment.id).update(fields)
+        .catch(function(e) {
+          // If Firestore write fails, show error — Firestore listener will auto-correct the UI
+          toast("⚠️ Sync error: " + e.message);
+        });
+    }
+
+    // Keep fsUpdate for operations that need confirmation (create, end session)
+    async function fsUpdate(fields) {
+      if (!myAppointment) return;
+      try {
+        await db.collection("appointments").doc(myAppointment.id).update(fields);
+      } catch(e) {
+        toast("❌ " + e.message);
+        throw e;
+      }
+    }
+
+    var tokenCooldown = false;
+    var cooldownTimer = null;
+
+    function startTokenCooldown() {
+      tokenCooldown = true;
+      var secs = 5;
+
+      // Disable both buttons immediately
+      var btnPrev = eid("op-prev");
+      var btnNext = eid("op-next");
+      var cdEl    = eid("token-cooldown");
+      if (btnPrev) btnPrev.disabled = true;
+      if (btnNext) btnNext.disabled = true;
+      if (cdEl)    cdEl.style.display = "flex";
+
+      // Countdown tick
+      function tick() {
+        var cdEl2 = eid("token-cooldown");
+        var cdNum = eid("cooldown-num");
+        if (cdNum) cdNum.textContent = "0:0" + secs;
+        if (secs === 0) {
+          tokenCooldown = false;
+          // Re-enable buttons based on current state
+          var p = eid("op-prev");
+          var n = eid("op-next");
+          var apt = myAppointment;
+          if (p && apt) p.disabled = !apt || apt.status === "notstarted" || apt.currentToken <= 1;
+          if (n && apt) n.disabled = !apt || apt.status === "notstarted" || apt.currentToken >= apt.totalTokens;
+          if (cdEl2) cdEl2.style.display = "none";
+          return;
+        }
+        secs--;
+        cooldownTimer = setTimeout(tick, 1000);
+      }
+      tick();
+    }
+
+    function nextToken() {
+      if (!myAppointment || tokenCooldown) return;
+      optimistic({
+        currentToken: Math.min(myAppointment.currentToken + 1, myAppointment.totalTokens),
+        status: "normal"
+      });
+      startTokenCooldown();
+    }
+
+    function prevToken() {
+      if (!myAppointment || tokenCooldown) return;
+      optimistic({
+        currentToken: Math.max(myAppointment.currentToken - 1, 1)
+      });
+      startTokenCooldown();
+    }
+
+    function setStatus(s) {
+      if (!myAppointment) return;
+      optimistic({ status: s });
+    }
+
+    function startServing() {
+      if (!myAppointment) return;
+      optimistic({ status: "normal" });
+    }
+
+    function toggleStop() {
+      if (!myAppointment) return;
+      var newStatus = myAppointment.status === "break" ? "normal" : "break";
+      optimistic({ status: newStatus });
+    }
+
+    function toggleEmergency() {
+      if (!myAppointment) return;
+      var newStatus = myAppointment.status === "emergency" ? "normal" : "emergency";
+      optimistic({ status: newStatus });
+    }
+
+    function toggleNoPatient() {
+      if (!myAppointment) return;
+      var newStatus = myAppointment.status === "nopatient" ? "normal" : "nopatient";
+      optimistic({ status: newStatus });
+    }
+
+    async function endSession() {
+      if (!myAppointment || !confirm("End this appointment session? Patients will no longer see it.")) return;
+      try {
+        await db.collection("appointments").doc(myAppointment.id).update({
+          active: false,
+          endedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        toast("Session ended.");
+        activeTab = "my-session";
+      } catch(e) { toast("❌ " + e.message); }
+    }
+
+    async function sendInstruction() {
+      if (!myAppointment) return;
+      var msg = (val("op-inst-input")||"").trim().slice(0, 300);
+      var btn = eid("op-inst-send");
+      btn.disabled = true; btn.textContent = "Sending…";
+      try {
+        await fsUpdate({ instruction: msg });
+        toast("📢 Message sent!");
+      } catch(e) {}
+      btn.disabled = false; btn.textContent = "Send";
+    }
+
+    async function testBackend() {
+      toast("🔌 Testing backend…", 3000);
+      try {
+        var res = await fetch(BACKEND + "/api/health");
+        var data = await res.json();
+        toast("✅ Backend OK: " + data.status, 3000);
+      } catch(e) {
+        toast("❌ Backend unreachable: " + e.message, 5000);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════
+       HTML BUILDERS
+    ════════════════════════════════════════════════════ */
+
+    function splashHTML() {
+      return `<div class="splash"><div class="splash-logo">W</div><p>Loading Waitless…</p></div>`;
+    }
+
+    function navHTML(opts) {
+      opts = opts || {};
+      var back       = opts.back || false;
+      var backLabel  = opts.backLabel || "Home";
+      var publicNote = opts.publicNote || false;
+      return `
+        <nav class="nav">
+          <div class="nav-left">
+            ${back ? `<button class="btn-ghost" id="nav-back">← ${x(backLabel)}</button>` : ""}
+            <div class="nav-brand">Waitless</div>
+          </div>
+          <div class="nav-actions">
+            ${publicNote ? `<span class="nav-right-note">Live · No login needed</span>` : ""}
+            ${currentUser ? `
+              <img src="${x(currentUser.photoURL||"")}" class="avatar" alt="" onerror="this.style.display='none'" />
+              <span class="nav-user">${x(currentUser.displayName||"Doctor")}</span>
+              <button class="btn-ghost" id="nav-logout">Sign Out</button>
+              ${!back ? `<button class="btn-primary" id="nav-panel">My Panel →</button>` : ""}
+            ` : (!back ? `<button class="btn-google" id="nav-login">${googleSVG()} Sign in with Google</button>` : "")}
+          </div>
+        </nav>`;
+    }
+
+    /* ── HOME ─────────────────────────────────────────── */
+    function homeHTML() {
+      return `
+        <div>
+          ${navHTML()}
+          <header class="hero">
+            <div class="hero-pill">Real-time clinic token tracking</div>
+            <h1 class="hero-title">Know your<br /><span class="accent">wait.</span></h1>
+            <p class="hero-sub">Doctors manage appointment tokens live. Patients check status instantly — no login needed.</p>
+            <div class="hero-cta">
+              <button class="btn-primary btn-lg" id="hero-view">View Live Tokens</button>
+              ${!currentUser ? `<button class="btn-outline btn-lg" id="hero-login">Doctor Login</button>` : ""}
+            </div>
+          </header>
+          ${previewSectionHTML()}
+          <section class="features">
+            ${feat("⚡","Instant Updates","Token status changes reflect for everyone in real-time.")}
+            ${feat("🔒","Doctors Only","Only verified Google-signed doctors can create & control appointments.")}
+            ${feat("👁️","Public View","Patients check status from any device without creating an account.")}
+            ${feat("🚨","Emergency Mode","One tap to pause the queue and broadcast an emergency alert.")}
+          </section>
+          <footer class="footer">
+            <span>Waitless © 2025</span>
+            <span>Built for better clinic experiences</span>
+          </footer>
+        </div>`;
+    }
+
+    function previewSectionHTML() {
+      if (!allAppointments.length) return `<div id="preview-section"></div>`;
+      return `
+        <section class="clinics-preview" id="preview-section">
+          <h2 class="section-title">Active Clinics Right Now</h2>
+          <div class="clinic-grid">${allAppointments.map(clinicCardHTML).join("")}</div>
+        </section>`;
+    }
+
+    function clinicCardHTML(apt) {
+      var m = STATUS[apt.status]||STATUS.notstarted||STATUS.normal;
+      return `
+        <div class="clinic-card" data-id="${apt.id}" style="--accent:${m.color}">
+          <div class="clinic-card-status" style="background:${m.color}22;color:${m.color}">${m.icon} ${m.label}</div>
+          <div class="clinic-card-name">${x(apt.doctorName)}</div>
+          <div class="clinic-card-title">${x(apt.title)}</div>
+          <div class="clinic-card-token">
+            <span class="token-label">Current Token</span>
+            <span class="token-num">${apt.currentToken}</span>
+          </div>
+        </div>`;
+    }
+
+    function feat(icon, title, desc) {
+      return `<div class="feature"><div class="feature-icon">${icon}</div><h3>${title}</h3><p>${desc}</p></div>`;
+    }
+
+    /* ── DOCTOR PANEL ─────────────────────────────────── */
+    function doctorHTML() {
+      var hasSession = !!myAppointment;
+      return `
+        <div class="doctor-panel">
+          ${navHTML({back:true, backLabel:"Home"})}
+
+          <div class="panel-tabs">
+            <button class="panel-tab ${activeTab==="my-session"?"active":""}" id="tab-my-session">
+              📋 My Session
+            </button>
+            <button class="panel-tab ${activeTab==="operating"?"active":""}" id="tab-operating">
+              🎛️ Operating
+              ${hasSession ? `<span class="tab-badge">1</span>` : ""}
+            </button>
+            <button class="panel-tab ${activeTab==="history"?"active":""}" id="tab-history">
+              📂 My Appointments
+            </button>
+          </div>
+
+          <div class="tab-content ${activeTab==="my-session"?"active":""}" id="tc-my-session">
+            ${mySessionTabHTML()}
+          </div>
+
+          <div class="tab-content ${activeTab==="operating"?"active":""}" id="tc-operating">
+            ${hasSession ? operatingTabHTML() : operatingEmptyHTML()}
+          </div>
+
+          <div class="tab-content ${activeTab==="history"?"active":""}" id="tc-history">
+            ${historyTabHTML()}
+          </div>
+        </div>`;
+    }
+
+    function mySessionTabHTML() {
+      return `
+        <div class="my-session-body">
+          <div class="my-session-heading">My Session</div>
+          <div class="my-session-sub">Create and manage your clinic appointment session.</div>
+          ${myAppointment ? activeSessionSummaryHTML() : createFormHTML()}
+        </div>`;
+    }
+
+    function createFormHTML() {
+      return `
+        <div class="create-card">
+          <h3>Start New Appointment Session</h3>
+          <p class="create-sub">You can have one active session at a time. The session goes live the moment you start it.</p>
+          <div class="form-grid">
+            <label>
+              Session Title *
+              <input class="inp" id="f-title" placeholder="e.g. Morning OPD, Cardiology Clinic" />
+            </label>
+            <label>
+              Scheduled Time
+              <span style="font-size:12px;font-weight:400;color:var(--muted)">(shown to patients, optional)</span>
+              <input class="inp" id="f-start" type="time" />
+            </label>
+            <label>
+              Total Tokens
+              <input class="inp" id="f-tokens" type="number" min="1" max="500" value="20" />
+            </label>
+            <label>
+              Notes (optional)
+              <input class="inp" id="f-notes" placeholder="e.g. Please bring your reports" />
+            </label>
+          </div>
+          <button class="btn-primary btn-lg create-btn" id="create-btn">🚀 Start Appointment Session</button>
+        </div>`;
+    }
+
+    function activeSessionSummaryHTML() {
+      var apt = myAppointment;
+      var m   = STATUS[apt.status]||STATUS.normal;
+      return `
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="active-session-card">
+            <div class="asc-left">
+              <div class="asc-label">🟢 Active Session</div>
+              <div class="asc-title">${x(apt.title)}</div>
+              <div class="asc-meta">
+                ${apt.startTime ? "Scheduled for "+x(apt.startTime)+" &nbsp;·&nbsp; " : ""}
+                ${apt.totalTokens} total tokens
+              </div>
+              <span style="background:${m.color}22;color:${m.color};padding:5px 14px;border-radius:100px;font-size:13px;font-weight:700;display:inline-block">
+                ${m.icon} ${m.label}
+              </span>
+            </div>
+            <div class="asc-token">
+              <div class="asc-token-label">Now Serving</div>
+              <div class="asc-token-num" style="color:${m.color}">${apt.status==="notstarted"?"—":apt.currentToken}</div>
+              <div class="asc-token-of">of ${apt.totalTokens}</div>
+            </div>
+            <div class="asc-actions">
+              <button class="btn-go-operate" id="btn-go-operate">🎛️ Open Controller</button>
+              <button class="btn-red" id="btn-end-summary">End Session</button>
+            </div>
+          </div>
+          ${apt.instruction ? `
+            <div class="broadcast-preview">
+              <span>📢</span>
+              <span>Live broadcast: <strong>${x(apt.instruction)}</strong></span>
+            </div>` : ""}
+        </div>`;
+    }
+
+    /* ── OPERATING APPOINTMENTS TAB ───────────────────── */
+    function operatingTabHTML() {
+      var apt      = myAppointment;
+      var m        = STATUS[apt.status] || STATUS.normal;
+      var pct      = Math.round((apt.currentToken / apt.totalTokens) * 100);
+      var started  = apt.status !== "notstarted";
+      var stopped  = apt.status === "break";
+      var emergency= apt.status === "emergency";
+      var nopatient= apt.status === "nopatient";
+
+      return `
+        <div class="op-body">
+
+          <!-- ── Session info bar ── -->
+          <div class="op-topbar">
+            <div class="op-topbar-info">
+              <div class="op-session-name">${x(apt.title)}</div>
+              <div class="op-session-meta">
+                Dr. ${x(apt.doctorName)}
+                ${apt.startTime ? " · Scheduled " + x(apt.startTime) : ""}
+                · ${apt.totalTokens} tokens
+              </div>
+            </div>
+            <div class="op-live-badge" style="background:${m.color}22;color:${m.color}">
+              <span class="op-live-dot" style="background:${m.color}"></span>
+              ${m.icon} ${m.label}
+            </div>
+          </div>
+
+          <!-- ── Token hero + nav (all in one card) ── -->
+          <div class="op-token-hero">
+            <div class="op-token-eyebrow">Now Serving Token</div>
+            <div class="op-token-num" style="color:${m.color}">
+              ${apt.status === "notstarted" ? "—" : apt.currentToken}
+            </div>
+            <div class="op-token-denom">out of ${apt.totalTokens} tokens</div>
+            <div class="op-progress-track">
+              <div class="op-progress-fill" style="width:${pct}%;background:${m.color}"></div>
+            </div>
+            <div class="op-progress-pct">${pct}% complete</div>
+
+            <!-- Token nav buttons right below the number -->
+            <div class="op-token-nav" style="margin-top:24px">
+              <button class="op-nav-btn" id="op-prev"
+                ${!started || tokenCooldown || apt.currentToken <= 1 ? "disabled" : ""}>
+                ← Back
+              </button>
+              <button class="op-nav-btn op-nav-next" id="op-next"
+                ${!started || tokenCooldown || apt.currentToken >= apt.totalTokens ? "disabled" : ""}>
+                Next →
+              </button>
+            </div>
+
+            <!-- Cooldown timer -->
+            <div class="token-cooldown-row" id="token-cooldown"
+              style="display:${tokenCooldown ? "flex" : "none"};margin-top:12px;justify-content:center">
+              <span class="cd-icon">⏱️</span>
+              <span>Cooldown: <strong id="cooldown-num">0:05</strong></span>
+            </div>
+          </div>
+
+          <!-- ── MAIN CONTROL PANEL ── -->
+          <div class="op-control-panel">
+            <div class="op-ctrl-section-label">Appointment Control</div>
+            <div class="op-main-controls">
+
+              ${!started ? `
+                <button class="op-ctrl-btn op-ctrl-start" id="op-start-serving">
+                  <span class="op-ctrl-icon">▶️</span>
+                  <span class="op-ctrl-text">
+                    <span class="op-ctrl-name">Start</span>
+                    <span class="op-ctrl-desc">Begin serving patients</span>
+                  </span>
+                </button>
+              ` : `
+                <button class="op-ctrl-btn ${stopped?"op-ctrl-active":"op-ctrl-stop"}" id="op-btn-stop"
+                  style="${stopped?"border-color:var(--blue);color:var(--blue)":""}">
+                  <span class="op-ctrl-icon">${stopped ? "▶️" : "⏹️"}</span>
+                  <span class="op-ctrl-text">
+                    <span class="op-ctrl-name">${stopped ? "Resume" : "Stop"}</span>
+                    <span class="op-ctrl-desc">${stopped ? "Resume serving" : "Pause the queue"}</span>
+                  </span>
+                </button>
+              `}
+
+              <button class="op-ctrl-btn ${emergency?"op-ctrl-active":"op-ctrl-emergency"}" id="op-btn-emergency"
+                style="${emergency?"border-color:var(--red);color:var(--red)":""}" ${!started?"disabled":""}>
+                <span class="op-ctrl-icon">🚨</span>
+                <span class="op-ctrl-text">
+                  <span class="op-ctrl-name">${emergency ? "Resume" : "Emergency"}</span>
+                  <span class="op-ctrl-desc">${emergency ? "Cancel emergency" : "Emergency patient"}</span>
+                </span>
+              </button>
+
+              <button class="op-ctrl-btn ${nopatient?"op-ctrl-active":"op-ctrl-nopat"}" id="op-btn-nopatient"
+                style="${nopatient?"border-color:var(--yellow);color:var(--yellow)":""}" ${!started?"disabled":""}>
+                <span class="op-ctrl-icon">🟡</span>
+                <span class="op-ctrl-text">
+                  <span class="op-ctrl-name">${nopatient ? "Patients Arrived" : "No Patients"}</span>
+                  <span class="op-ctrl-desc">${nopatient ? "Mark queue active" : "Queue is empty"}</span>
+                </span>
+              </button>
+
+              <button class="op-ctrl-btn op-ctrl-end" id="op-end-session">
+                <span class="op-ctrl-icon">🔚</span>
+                <span class="op-ctrl-text">
+                  <span class="op-ctrl-name">End</span>
+                  <span class="op-ctrl-desc">Close this session</span>
+                </span>
+              </button>
+
+            </div>
+
+            ${emergency ? `
+            <div class="op-continue-banner" style="margin-top:16px">
+              <div>
+                <div class="op-continue-title">🚨 Emergency Mode Active</div>
+                <div class="op-continue-desc">Queue is paused. Click Resume to continue.</div>
+              </div>
+              <button class="btn-continue-op" id="op-continue">✅ Resume Queue</button>
+            </div>` : ""}
+
+            ${stopped ? `
+            <div class="op-stopped-banner" style="margin-top:16px">
+              <div class="op-stopped-text">⏹️ Queue is Stopped</div>
+              <div class="op-stopped-desc">Patients see "Doctor on Break". Click Resume to continue.</div>
+            </div>` : ""}
+
+          </div>
+
+          <!-- ── Broadcast message ── -->
+          <div class="op-instr-box">
+            <div class="op-section-label">📢 Broadcast Message to Patients</div>
+            <div class="op-instr-row">
+              <input class="inp" id="op-inst-input"
+                placeholder="e.g. Please wait outside, 15 min delay…"
+                value="${x(apt.instruction || "")}" />
+              <button class="btn-primary" id="op-inst-send">Send</button>
+            </div>
+            ${apt.instruction ? `
+              <div class="op-current-instr">
+                <span>📢</span>
+                <span>Live message: <strong>${x(apt.instruction)}</strong></span>
+              </div>` : ""}
+          </div>
+
+        </div>`;
+    }
+
+        function statusBtnHTML(key, current) {
+      var m = STATUS[key];
+      var isActive = current === key;
+      return `
+        <button class="op-status-btn ${isActive?"s-active":""}" data-os="${key}"
+          style="border-color:${isActive?m.color:"transparent"}">
+          <span class="op-status-icon">${m.icon}</span>
+          <span class="op-status-text">
+            <span class="op-status-name" style="color:${isActive?m.color:"var(--text)"}">${m.label}</span>
+            <span class="op-status-desc">${m.desc}</span>
+          </span>
+        </button>`;
+    }
+
+    function operatingEmptyHTML() {
+      return `
+        <div class="op-empty">
+          <div class="op-empty-icon">🩺</div>
+          <h3>No Active Session</h3>
+          <p>Start an appointment session first to access the operating controls.</p>
+          <button class="btn-primary btn-lg" id="op-go-create">Go to My Session →</button>
+        </div>`;
+    }
+
+    /* ── MY APPOINTMENTS HISTORY TAB ────────────────────── */
+    var histLoaded = false; // track if Firestore has responded at least once
+
+    function historyTabHTML() {
+      var apts = myAllAppointments;
+      return `
+        <div class="hist-body">
+          <div class="hist-heading">My Appointments</div>
+          <div class="hist-sub">All appointment sessions you have created — active and past.</div>
+          ${!histLoaded ? `
+            <div class="hist-loading">
+              <div class="hist-loader"></div>
+              <p>Loading your appointments…</p>
+            </div>
+          ` : apts.length === 0 ? `
+            <div class="op-empty">
+              <div class="op-empty-icon">📂</div>
+              <h3>No Appointments Yet</h3>
+              <p>Your created sessions will appear here.</p>
+              <button class="btn-primary btn-lg" id="hist-go-create">Create First Session →</button>
+            </div>
+          ` : `
+            <div class="hist-list">
+              ${apts.map(histCardHTML).join("")}
+            </div>
+          `}
+        </div>`;
+    }
+
+    function histCardHTML(apt) {
+      var isActive = apt.active;
+      var m = STATUS[apt.status] || STATUS.normal;
+      var pct = Math.round(((apt.currentToken||1) / (apt.totalTokens||1)) * 100);
+      var dateStr = "";
+      if (apt.createdAt && apt.createdAt.seconds) {
+        var d = new Date(apt.createdAt.seconds * 1000);
+        dateStr = d.toLocaleDateString([], {day:"numeric", month:"short", year:"numeric"})
+                + " at " + d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+      }
+      return `
+        <div class="hist-card ${isActive ? "hist-card-active" : "hist-card-ended"}">
+          <div class="hist-card-top">
+            <div class="hist-card-info">
+              <div class="hist-card-title">${x(apt.title)}</div>
+              <div class="hist-card-meta">
+                ${dateStr ? "Created " + dateStr : ""}
+                ${apt.startTime ? " &nbsp;·&nbsp; Scheduled " + x(apt.startTime) : ""}
+                &nbsp;·&nbsp; ${apt.totalTokens} tokens
+              </div>
+            </div>
+            <div class="hist-card-badge ${isActive ? "hist-badge-active" : "hist-badge-ended"}">
+              ${isActive ? m.icon + " Active" : "✅ Ended"}
+            </div>
+          </div>
+
+          <div class="hist-card-stats">
+            <div class="hist-stat">
+              <div class="hist-stat-val" style="color:${isActive ? m.color : "var(--muted)"}">${apt.status==="notstarted"?"—":apt.currentToken}</div>
+              <div class="hist-stat-lbl">Current Token</div>
+            </div>
+            <div class="hist-stat">
+              <div class="hist-stat-val">${apt.totalTokens}</div>
+              <div class="hist-stat-lbl">Total Tokens</div>
+            </div>
+            <div class="hist-stat">
+              <div class="hist-stat-val">${isActive && apt.status!=="notstarted" ? pct+"%" : (isActive?"—":pct+"%")}</div>
+              <div class="hist-stat-lbl">Progress</div>
+            </div>
+          </div>
+
+          ${isActive ? `
+            <div class="hist-card-actions">
+              <button class="btn-primary hist-go-operate" data-id="${apt.id}">🎛️ Open Controller</button>
+            </div>` : ""}
+        </div>`;
+    }
+
+    /* ── Patch doctor tabs on live updates ────────────── */
+    function patchDoctorTabs() {
+      var tc1  = eid("tc-my-session");
+      var tc2  = eid("tc-operating");
+      var tc3  = eid("tc-history");
+      var tb1  = eid("tab-my-session");
+      var tb2  = eid("tab-operating");
+      var tb3  = eid("tab-history");
+      var has  = !!myAppointment;
+
+      if (tc1) { tc1.innerHTML = mySessionTabHTML();                               bindMySessionContent(); }
+      if (tc2) { tc2.innerHTML = has ? operatingTabHTML() : operatingEmptyHTML();  bindOperatingContent(); }
+      if (tc3) { tc3.innerHTML = historyTabHTML();                                  bindHistoryContent(); }
+
+      if (tb2) tb2.innerHTML = "🎛️ Operating" + (has ? '<span class="tab-badge">1</span>' : "");
+
+      // Sync active highlight
+      if (tb1) tb1.classList.toggle("active", activeTab === "my-session");
+      if (tb2) tb2.classList.toggle("active", activeTab === "operating");
+      if (tb3) tb3.classList.toggle("active", activeTab === "history");
+      if (tc1) tc1.classList.toggle("active",  activeTab === "my-session");
+      if (tc2) tc2.classList.toggle("active",  activeTab === "operating");
+      if (tc3) tc3.classList.toggle("active",  activeTab === "history");
+    }
+
+    /* ── PUBLIC BOARD ─────────────────────────────────── */
+    function publicHTML() {
+      return `
+        <div class="public-board">
+          ${navHTML({back:true, backLabel:"Home", publicNote:true})}
+          <div class="board-body">
+            <h2 class="board-title">Active Clinic Sessions</h2>
+            <div class="search-wrap">
+              <span class="search-icon-el">🔍</span>
+              <input class="search-inp" id="search-inp"
+                placeholder="Search by doctor name or clinic title…"
+                value="${x(searchQuery)}" />
+              <button class="search-clear ${searchQuery?"show":""}" id="search-clear">✕</button>
+            </div>
+            <div id="board-grid">${pubCardsInner()}</div>
+          </div>
+        </div>`;
+    }
+
+    function filtered() {
+      if (!searchQuery.trim()) return allAppointments;
+      var q = searchQuery.toLowerCase();
+      return allAppointments.filter(function(a){
+        return (a.doctorName||"").toLowerCase().includes(q) ||
+               (a.title||"").toLowerCase().includes(q);
+      });
+    }
+
+    function pubCardsInner() {
+      var list = filtered();
+      if (!allAppointments.length)
+        return `<div class="empty-state"><div class="empty-icon">🏥</div><p>No active sessions right now.</p><span>Check back later or ask your doctor.</span></div>`;
+      if (!list.length)
+        return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No results for "${x(searchQuery)}"</p><span>Try a different doctor name or clinic title.</span></div>`;
+      return `<div class="board-grid">${list.map(pubCardHTML).join("")}</div>`;
+    }
+
+    function pubCardHTML(apt) {
+      var m = STATUS[apt.status]||STATUS.notstarted||STATUS.normal;
+      return `
+        <div class="pub-card" data-id="${apt.id}" style="--accent:${m.color}">
+          <div class="pub-card-inner">
+            <div class="pub-dot" style="background:${m.color}"></div>
+            <div class="pub-info">
+              <div class="pub-doctor">${x(apt.doctorName)}</div>
+              <div class="pub-title-txt">${x(apt.title)}</div>
+              <div class="pub-status-lbl" style="color:${m.color}">${m.icon} ${m.label}</div>
+            </div>
+            <div class="pub-token-badge">
+              <div class="pub-token-n" style="color:${m.color}">${apt.status==="notstarted"?"—":apt.currentToken}</div>
+              <div class="pub-token-l">${apt.status==="notstarted"?"Not Started":"Now Serving"}</div>
+            </div>
+          </div>
+          <div class="pub-card-foot">Tap to view details →</div>
+        </div>`;
+    }
+
+    /* ── LIVE TOKEN VIEW ──────────────────────────────── */
+    function liveHTML() {
+      return `
+        <div class="public-board">
+          ${navHTML({back:true, backLabel:"All Clinics", publicNote:true})}
+          <div class="live-view" id="live-wrap">${liveCardHTML()}</div>
+        </div>`;
+    }
+
+    function liveCardHTML() {
+      var apt = selectedApt; if (!apt) return "";
+      var m   = STATUS[apt.status]||STATUS.normal;
+      var pct = Math.round((apt.currentToken/apt.totalTokens)*100);
+      var shareUrl = window.location.href.split("?")[0] + "?apt=" + apt.id;
+      var shareTitle = apt.doctorName + " — " + apt.title;
+      return `
+        <div class="live-card">
+          <div class="live-dr-row">
+            ${apt.doctorPhoto ? `<img src="${x(apt.doctorPhoto)}" class="live-avatar" alt="" onerror="this.style.display='none'" />` : ""}
+            <div>
+              <div class="live-dr-name">${x(apt.doctorName)}</div>
+              <div class="live-session-lbl">${x(apt.title)}</div>
+            </div>
+          </div>
+
+          <div class="live-status-banner" style="background:${m.color}22;border:1.5px solid ${m.color}">
+            <span class="live-status-icon">${m.icon}</span>
+            <span style="color:${m.color};font-weight:700">${m.label}</span>
+            ${apt.status==="emergency" ? `<span class="blink" style="color:${m.color}"> — Queue Paused</span>` : ""}
+          </div>
+
+          <div class="live-token-main">
+            <div class="live-token-eyebrow">Now Serving</div>
+            <div class="live-token-number" style="color:${m.color}">${apt.status==="notstarted"?"—":apt.currentToken}</div>
+            <div class="live-token-of">out of ${apt.totalTokens} tokens</div>
+          </div>
+
+          <div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${pct}%;background:${m.color}"></div>
+            </div>
+            <div class="progress-lbl">${pct}% complete</div>
+          </div>
+
+          ${apt.instruction ? `
+            <div class="live-instr">
+              <span class="inst-icon">📢</span>
+              <span>${x(apt.instruction)}</span>
+            </div>` : ""}
+
+          ${apt.startTime ? `<div class="live-meta">Scheduled for ${x(apt.startTime)}</div>` : ""}
+
+          <div class="share-row">
+            <button class="btn-share" id="btn-share"
+              data-url="${x(shareUrl)}" data-title="${x(shareTitle)}">
+              📤 Share
+            </button>
+            <button class="btn-copy" id="btn-copy" data-url="${x(shareUrl)}">
+              🔗 Copy Link
+            </button>
+          </div>
+
+          <div class="live-pulse-note">
+            <span class="pulse-dot" style="background:${m.color}"></span>
+            Live updates — refreshes automatically
+          </div>
+        </div>`;
+    }
+
+    function patchLive() {
+      var w = eid("live-wrap");
+      if (w) { w.innerHTML = liveCardHTML(); bindLiveButtons(); }
+    }
+
+    /* ════════════════════════════════════════════════════
+       EVENT BINDING
+    ════════════════════════════════════════════════════ */
+    function on(id, fn) { var e = eid(id); if (e) e.addEventListener("click", fn); }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      var tabs = document.querySelectorAll(".panel-tab");
+      tabs.forEach(function(t){ t.classList.remove("active"); });
+      var panels = document.querySelectorAll(".tab-content");
+      panels.forEach(function(p){ p.classList.remove("active"); });
+      var tabBtn   = eid("tab-" + tab);
+      var tabPanel = eid("tc-"  + tab);
+      if (tabBtn)   tabBtn.classList.add("active");
+      if (tabPanel) tabPanel.classList.add("active");
+
+      // When switching to history tab, always re-render with latest data
+      if (tab === "history" && tabPanel) {
+        tabPanel.innerHTML = historyTabHTML();
+        bindHistoryContent();
+      }
+    }
+
+    function bindHome() {
+      on("nav-logout", logout);
+      on("nav-login",  login);
+      on("nav-panel",  function(){ go("doctor"); });
+      on("hero-view",  function(){ go("public"); });
+      on("hero-login", login);
+      reBindClinicCards();
+    }
+    function reBindClinicCards() {
+      document.querySelectorAll(".clinic-card[data-id]").forEach(function(c){
+        c.addEventListener("click", function(){ go("public"); });
+      });
+    }
+
+    function bindDoctor() {
+      on("nav-back",       function(){ go("home"); });
+      on("nav-logout",     logout);
+      on("tab-my-session", function(){ switchTab("my-session"); });
+      on("tab-operating",  function(){ switchTab("operating"); });
+      on("tab-history",    function(){ switchTab("history"); });
+      bindMySessionContent();
+      bindOperatingContent();
+      bindHistoryContent();
+    }
+
+    function bindHistoryContent() {
+      on("hist-go-create", function(){ switchTab("my-session"); });
+      // "Open Controller" buttons on history cards
+      document.querySelectorAll(".hist-go-operate").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          // If this is the active appointment, jump to operating tab
+          if (myAppointment && btn.dataset.id === myAppointment.id) {
+            switchTab("operating");
+          } else {
+            toast("This session has ended and cannot be controlled.");
+          }
+        });
+      });
+    }
+
+    function bindMySessionContent() {
+      on("create-btn",      createAppointment);
+      on("btn-end-summary", endSession);
+      on("btn-go-operate",  function(){ switchTab("operating"); });
+    }
+
+    function bindOperatingContent() {
+      on("op-start-serving",  startServing);
+      on("op-test-backend",   testBackend);
+      on("op-btn-stop",       toggleStop);
+      on("op-btn-emergency",  toggleEmergency);
+      on("op-btn-nopatient",  toggleNoPatient);
+      on("op-continue",       function(){ setStatus("normal"); });
+      on("op-prev",           prevToken);
+      on("op-next",           nextToken);
+      on("op-end-session",    endSession);
+      on("op-inst-send",      sendInstruction);
+      on("op-go-create",      function(){ switchTab("my-session"); });
+      var ii = eid("op-inst-input");
+      if (ii) ii.addEventListener("keydown", function(e){ if(e.key==="Enter") sendInstruction(); });
+    }
+
+    function bindPublic() {
+      on("nav-back",    function(){ go("home"); });
+      on("nav-logout",  logout);
+      on("search-clear", function(){
+        searchQuery = "";
+        var si = eid("search-inp"); if(si) si.value = "";
+        var cl = eid("search-clear"); if(cl) cl.classList.remove("show");
+        var bg = eid("board-grid"); if(bg){ bg.innerHTML = pubCardsInner(); reBindPubCards(); }
+      });
+      var si = eid("search-inp");
+      if (si) {
+        si.addEventListener("input", function(){
+          searchQuery = si.value;
+          var cl = eid("search-clear"); if(cl) cl.classList.toggle("show", searchQuery.length > 0);
+          var bg = eid("board-grid"); if(bg){ bg.innerHTML = pubCardsInner(); reBindPubCards(); }
+        });
+        si.focus();
+      }
+      reBindPubCards();
+    }
+    function reBindPubCards() {
+      document.querySelectorAll(".pub-card[data-id]").forEach(function(c){
+        c.addEventListener("click", function(){
+          var found = allAppointments.find(function(a){ return a.id === c.dataset.id; });
+          if (found) go("live", found);
+        });
+      });
+    }
+
+    function bindLive() {
+      on("nav-back",   function(){ go("public"); });
+      on("nav-logout", logout);
+      bindLiveButtons();
+    }
+    function bindLiveButtons() {
+      var shareBtn = eid("btn-share");
+      if (shareBtn) shareBtn.addEventListener("click", function(){
+        var url = shareBtn.dataset.url, title = shareBtn.dataset.title;
+        if (navigator.share) {
+          navigator.share({title:"Waitless — "+title, text:"Check live token status for: "+title, url:url})
+            .catch(function(){});
+        } else {
+          copyText(url); toast("🔗 Link copied!");
+        }
+      });
+      var copyBtn = eid("btn-copy");
+      if (copyBtn) copyBtn.addEventListener("click", function(){
+        copyText(copyBtn.dataset.url);
+        toast("🔗 Link copied to clipboard!");
+      });
+    }
+
+    /* ── Utilities ────────────────────────────────────── */
+    function copyText(text) {
+      if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){ fallbackCopy(text); });
+      else fallbackCopy(text);
+    }
+    function fallbackCopy(text) {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+    }
+    function x(s) {
+      if (!s) return "";
+      return String(s)
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+    function val(id) { var e = eid(id); return e ? e.value : ""; }
+    function eid(id) { return document.getElementById(id); }
+
+    function googleSVG() {
+      return `<svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>`;
+    }
+
+    /* ── Boot ─────────────────────────────────────────── */
+    paint();
+
+    auth.onAuthStateChanged(function(user) {
+      currentUser = user;
+      if (currentView === "splash") go("home");
+      else paint();
+      if (user) startDoctorWatch(user.uid);
+      else {
+        if (aptUnsub)  { aptUnsub();  aptUnsub  = null; }
+        if (histUnsub) { histUnsub(); histUnsub = null; }
+        myAppointment      = null;
+        myAllAppointments  = [];
+      histLoaded         = false;
+      }
+    });
+
+  }); // end DOMContentLoaded
+  </script>
+</body>
+</html>
