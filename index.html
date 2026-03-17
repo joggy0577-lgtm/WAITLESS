@@ -2218,8 +2218,6 @@
         var btn = eid("btn-show-qr");
         if (btn && currentUser) {
           showQRModal(btn.dataset.uid, btn.dataset.name);
-          // Also render mini preview in card
-          renderMiniQR();
         }
       });
       on("btn-copy-profile-link", function(){
@@ -2229,9 +2227,6 @@
           toast("🔗 Profile link copied!");
         }
       });
-
-      // Auto-render mini QR in background
-      renderMiniQR();
 
       // GPS button in create form
       on("btn-loc-gps", async function(){
