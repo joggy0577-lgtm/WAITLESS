@@ -551,6 +551,172 @@
     .cd-icon { font-size:18px; }
     .token-cooldown-row strong { font-family:var(--font-display); font-size:16px; }
 
+    /* ── WAITLESS ID BANNER (home page after login) ── */
+    .wl-id-banner {
+      display:flex; align-items:center; flex-wrap:wrap; gap:10px;
+      background:rgba(0,230,118,0.07); border:1.5px solid rgba(0,230,118,0.25);
+      border-radius:14px; padding:14px 20px; margin:24px auto 0;
+      max-width:520px;
+    }
+    .wl-id-label {
+      font-size:12px; text-transform:uppercase; letter-spacing:1px;
+      color:var(--muted); font-weight:600; flex-shrink:0;
+    }
+    .wl-id-value {
+      font-family:var(--font-display); font-size:22px; font-weight:800;
+      color:var(--green); letter-spacing:1px; flex-shrink:0;
+    }
+    .wl-id-copy {
+      background:var(--bg3); color:var(--muted); border:1px solid var(--border);
+      padding:6px 14px; border-radius:8px; font-size:13px; cursor:pointer; flex-shrink:0;
+      transition:all .18s;
+    }
+    .wl-id-copy:hover { color:var(--green); border-color:var(--green); }
+    .wl-id-note {
+      font-size:12px; color:var(--muted); width:100%;
+    }
+
+    /* ── NAV WL ID chip ── */
+    .nav-wl-id {
+      font-family:var(--font-display); font-size:12px; font-weight:800;
+      color:var(--green); background:rgba(0,230,118,0.1);
+      padding:3px 10px; border-radius:100px; letter-spacing:.5px;
+      border:1px solid rgba(0,230,118,0.25); flex-shrink:0;
+    }
+
+    /* ── PUBLIC BOARD SEARCH PANEL ── */
+    .pub-search-panel {
+      display:flex; flex-direction:column; gap:10px;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:var(--radius); padding:18px 16px; margin-bottom:24px;
+    }
+    .pub-search-row {
+      display:flex; gap:10px; align-items:center;
+    }
+    .btn-gps-search {
+      background:var(--bg3); color:var(--text); font-weight:600;
+      padding:0 16px; border-radius:10px; border:1.5px solid var(--border);
+      font-size:13px; white-space:nowrap; height:46px; flex-shrink:0;
+      transition:all .18s; cursor:pointer; font-family:var(--font-body);
+    }
+    .btn-gps-search:hover { border-color:var(--green); color:var(--green); }
+    .btn-gps-search:disabled { opacity:.5; cursor:not-allowed; }
+    .btn-clear-all {
+      background:transparent; color:var(--muted); font-size:13px;
+      padding:6px 0; border:none; cursor:pointer; text-align:left;
+      font-family:var(--font-body); transition:color .18s;
+    }
+    .btn-clear-all:hover { color:var(--red); }
+
+    /* ── LOCATION IN CREATE FORM ── */
+    .loc-input-wrap {
+      display:flex; gap:10px; align-items:center;
+    }
+    .loc-input-wrap .inp { flex:1; }
+    .btn-loc-gps {
+      background:var(--bg3); color:var(--text); font-weight:600;
+      padding:12px 14px; border-radius:10px; border:1.5px solid var(--border);
+      font-size:13px; white-space:nowrap; flex-shrink:0; cursor:pointer;
+      font-family:var(--font-body); transition:all .18s;
+    }
+    .btn-loc-gps:hover { border-color:var(--green); color:var(--green); }
+    .btn-loc-gps:disabled { opacity:.5; cursor:not-allowed; }
+    .loc-status {
+      display:block; font-size:12px; margin-top:6px; min-height:16px;
+    }
+
+    /* ── LOCATION ON PUB CARD ── */
+    .pub-location {
+      font-size:12px; color:var(--muted); margin-bottom:4px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+
+    /* ════════════════════════════════════════════════════
+       PROFILE PAGE CSS
+    ════════════════════════════════════════════════════ */
+    .prof-body { max-width:640px; margin:0 auto; padding:0 0 80px; }
+
+    /* Cover */
+    .prof-cover { position:relative; height:120px; }
+    .prof-cover-bg { height:100%; background:linear-gradient(135deg,#0d1f14,#0a1a2e); }
+    .prof-avatar-wrap { position:absolute; bottom:-36px; left:20px; }
+    .prof-avatar { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--bg); background:var(--bg3); }
+
+    /* Info card */
+    .prof-info-card { background:var(--bg2); border:1px solid var(--border); border-radius:0 0 var(--radius) var(--radius); padding:52px 20px 20px; margin-bottom:16px; }
+    .prof-info-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+    .prof-name { font-family:var(--font-display); font-size:22px; font-weight:800; margin-bottom:4px; }
+    .prof-clinic { font-size:14px; color:var(--text); font-weight:600; margin-bottom:2px; }
+    .prof-spec { font-size:13px; color:var(--muted); margin-bottom:2px; }
+    .prof-loc-txt { font-size:13px; color:var(--muted); margin-bottom:6px; }
+    .prof-wl-id { font-family:var(--font-display); font-size:13px; font-weight:700; color:var(--green); background:rgba(0,230,118,0.1); display:inline-block; padding:2px 10px; border-radius:100px; border:1px solid rgba(0,230,118,0.2); }
+    .prof-stats { display:flex; gap:28px; }
+    .prof-stat-val { font-family:var(--font-display); font-size:22px; font-weight:800; }
+    .prof-stat-lbl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:2px; }
+
+    /* Follow / Edit buttons */
+    .prof-actions { flex-shrink:0; }
+    .btn-follow { background:var(--green); color:#000; font-weight:800; padding:10px 20px; border-radius:10px; font-size:14px; border:none; cursor:pointer; transition:all .18s; }
+    .btn-follow:hover { background:#00ff87; }
+    .btn-following { background:var(--bg3); color:var(--text); border:1.5px solid var(--border); }
+    .btn-following:hover { border-color:var(--red); color:var(--red); }
+    .btn-edit-profile { background:var(--bg3); color:var(--text); font-weight:600; padding:10px 18px; border-radius:10px; font-size:14px; border:1.5px solid var(--border); cursor:pointer; transition:all .18s; }
+    .btn-edit-profile:hover { border-color:var(--green); color:var(--green); }
+
+    /* Appointments section on profile */
+    .prof-apts-section { padding:0 16px; }
+    .prof-section-title { font-family:var(--font-display); font-size:16px; font-weight:700; margin-bottom:14px; }
+    .prof-apts-list { display:flex; flex-direction:column; gap:10px; }
+    .prof-apt-card { background:var(--bg2); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:all .18s; }
+    .prof-apt-card:hover { border-color:var(--green); transform:translateY(-1px); }
+    .prof-apt-title { font-weight:700; font-size:15px; margin-bottom:4px; }
+    .prof-apt-meta { font-size:13px; color:var(--muted); }
+    .prof-apt-num { font-family:var(--font-display); font-size:32px; font-weight:800; line-height:1; }
+    .prof-apt-lbl { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; text-align:center; }
+    .prof-empty { text-align:center; padding:40px 20px; color:var(--muted); }
+    .prof-empty span { font-size:40px; display:block; margin-bottom:12px; }
+    .prof-empty p { font-size:14px; line-height:1.7; }
+
+    /* ════════════════════════════════════════════════════
+       EDIT PROFILE PAGE CSS
+    ════════════════════════════════════════════════════ */
+    .edit-prof-body { max-width:560px; margin:0 auto; padding:32px 16px 80px; }
+    .edit-prof-heading { font-family:var(--font-display); font-size:26px; font-weight:800; margin-bottom:24px; }
+    .edit-prof-avatar-row { display:flex; align-items:center; gap:16px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:24px; }
+    .edit-prof-avatar { width:60px; height:60px; border-radius:50%; object-fit:cover; background:var(--bg3); flex-shrink:0; }
+    .edit-prof-form { display:flex; flex-direction:column; gap:18px; margin-bottom:28px; }
+
+    /* ════════════════════════════════════════════════════
+       FEED PAGE CSS
+    ════════════════════════════════════════════════════ */
+    .feed-body { max-width:640px; margin:0 auto; padding:28px 16px 80px; }
+    .feed-heading { font-family:var(--font-display); font-size:26px; font-weight:800; margin-bottom:4px; }
+    .feed-sub { font-size:13px; color:var(--muted); margin-bottom:24px; }
+
+    .feed-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:14px; overflow:hidden; }
+    .feed-card-top { display:flex; align-items:center; gap:14px; padding:16px; }
+    .feed-avatar { width:46px; height:46px; border-radius:50%; object-fit:cover; background:var(--bg3); flex-shrink:0; }
+    .feed-card-info { flex:1; min-width:0; }
+    .feed-doctor-name { font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .feed-status { font-size:13px; margin-top:2px; font-weight:600; }
+    .feed-live { color:var(--green); }
+    .feed-offline { color:var(--muted); }
+    .feed-card-actions { display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+    .btn-unfollow { background:rgba(255,23,68,0.1); color:var(--red); border:1px solid rgba(255,23,68,0.25); border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:all .18s; }
+    .btn-unfollow:hover { background:rgba(255,23,68,0.2); }
+
+    .feed-apts { border-top:1px solid var(--border); padding:0; }
+    .feed-apt-row { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; cursor:pointer; transition:background .18s; border-bottom:1px solid var(--border); }
+    .feed-apt-row:last-child { border-bottom:none; }
+    .feed-apt-row:hover { background:var(--bg3); }
+    .feed-apt-title { font-size:14px; font-weight:600; }
+    .feed-apt-token { font-family:var(--font-display); font-size:24px; font-weight:800; }
+
+    /* nav feed button */
+    .nav-feed-btn { font-size:13px; }
+    .nav-avatar-btn { background:none; border:none; cursor:pointer; padding:0; border-radius:50%; transition:opacity .18s; }
+    .nav-avatar-btn:hover { opacity:.8; }
+
     /* ── SPLASH ── */
     .splash { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; gap:16px; }
     .splash-logo { width:72px; height:72px; border-radius:20px; background:var(--green); color:#000; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:36px; font-weight:800; }
@@ -626,9 +792,17 @@
     let myAppointment   = null;
     let selectedApt     = null;
     let aptUnsub        = null;
-    let searchQuery     = "";
-    let activeTab       = "my-session"; // "my-session" | "operating" | "history"
+    // searchQuery now declared above with other search state
+    let activeTab         = "my-session"; // "my-session" | "operating" | "history"
     let myAllAppointments = []; // all appointments by this doctor (active + past)
+    let userWaitlessId    = "";  // permanent WL-XXXXX id for this user/device
+    let searchAptId       = "";  // appointment id filter on public board
+    let searchLocation    = "";  // location filter on public board
+    let searchQuery       = "";  // keep for compat
+    let myProfile         = null; // logged-in user's profile data
+    let viewingProfile    = null; // profile being viewed publicly
+    let followingIds      = [];   // list of doctor uids this device follows (localStorage)
+    let feedAppointments  = [];   // live appointments from followed doctors
 
     const STATUS = {
       normal:    { label:"Serving Patients", color:"#00e676", icon:"🟢", desc:"Queue running normally"   },
@@ -640,19 +814,25 @@
     /* ── Router ──────────────────────────────────────── */
     function go(view, data) {
       currentView = view;
-      if (data !== undefined) selectedApt = data;
-      if (view !== "public") searchQuery = "";
+      if (data !== undefined) {
+        if (view === "live")    selectedApt     = data;
+        if (view === "profile") viewingProfile  = data;
+      }
+      if (view !== "public") { searchQuery = ""; }
       paint();
     }
 
     function paint() {
       const root = document.getElementById("root");
       switch (currentView) {
-        case "splash": root.innerHTML = splashHTML();                break;
-        case "home":   root.innerHTML = homeHTML();   bindHome();   break;
-        case "doctor": root.innerHTML = doctorHTML(); bindDoctor(); break;
-        case "public": root.innerHTML = publicHTML(); bindPublic(); break;
-        case "live":   root.innerHTML = liveHTML();   bindLive();   break;
+        case "splash":       root.innerHTML = splashHTML();                        break;
+        case "home":         root.innerHTML = homeHTML();        bindHome();       break;
+        case "doctor":       root.innerHTML = doctorHTML();      bindDoctor();     break;
+        case "public":       root.innerHTML = publicHTML();      bindPublic();     break;
+        case "live":         root.innerHTML = liveHTML();        bindLive();       break;
+        case "profile":      root.innerHTML = profileHTML();     bindProfile();    break;
+        case "edit-profile": root.innerHTML = editProfileHTML(); bindEditProfile();break;
+        case "feed":         root.innerHTML = feedHTML();        bindFeed();       break;
       }
     }
 
@@ -668,6 +848,108 @@
       setTimeout(function(){ t.remove(); }, ms);
     }
 
+    /* ── Waitless ID (permanent per user/device) ────────── */
+    // Each user gets a permanent WL-XXXXX id stored in localStorage
+    // tied to their Firebase UID so same id across devices after login
+    function getOrCreateWaitlessId(uid) {
+      var key  = "wl_id_" + uid;
+      var existing = localStorage.getItem(key);
+      if (existing) return existing;
+      // Generate new id: WL- + 5 random digits
+      var num = Math.floor(10000 + Math.random() * 90000);
+      var newId = "WL-" + num;
+      localStorage.setItem(key, newId);
+      return newId;
+    }
+
+    /* ── Follow system (localStorage, no login needed) ─── */
+    function loadFollowing() {
+      try {
+        var raw = localStorage.getItem("wl_following") || "[]";
+        followingIds = JSON.parse(raw);
+      } catch(e) { followingIds = []; }
+    }
+    function saveFollowing() {
+      localStorage.setItem("wl_following", JSON.stringify(followingIds));
+    }
+    function isFollowing(uid) {
+      return followingIds.indexOf(uid) !== -1;
+    }
+    function toggleFollow(uid) {
+      if (isFollowing(uid)) {
+        followingIds = followingIds.filter(function(id){ return id !== uid; });
+        // Decrement follower count in Firestore
+        db.collection("users").doc(uid).update({
+          followerCount: firebase.firestore.FieldValue.increment(-1)
+        }).catch(function(){});
+        toast("Unfollowed");
+      } else {
+        followingIds.push(uid);
+        // Increment follower count in Firestore
+        db.collection("users").doc(uid).update({
+          followerCount: firebase.firestore.FieldValue.increment(1)
+        }).catch(function(){});
+        toast("✅ Following!");
+      }
+      saveFollowing();
+    }
+
+    /* ── Profile Firestore helpers ───────────────────── */
+    async function loadProfile(uid) {
+      var snap = await db.collection("users").doc(uid).get();
+      if (snap.exists) return Object.assign({uid:uid}, snap.data());
+      return null;
+    }
+
+    async function saveMyProfile(data) {
+      var uid = currentUser.uid;
+      await db.collection("users").doc(uid).set(data, {merge:true});
+      myProfile = Object.assign(myProfile || {uid:uid}, data);
+    }
+
+    async function ensureMyProfile() {
+      if (!currentUser) return;
+      var uid  = currentUser.uid;
+      var snap = await db.collection("users").doc(uid).get();
+      if (!snap.exists) {
+        // Auto-create profile on first login
+        var prof = {
+          uid:           uid,
+          name:          currentUser.displayName || "User",
+          photo:         currentUser.photoURL    || "",
+          clinicName:    "",
+          specialization:"",
+          location:      "",
+          waitlessId:    getOrCreateWaitlessId(uid),
+          followerCount: 0,
+          createdAt:     firebase.firestore.FieldValue.serverTimestamp(),
+        };
+        await db.collection("users").doc(uid).set(prof);
+        myProfile = prof;
+      } else {
+        myProfile = Object.assign({uid:uid}, snap.data());
+      }
+    }
+
+    /* ── Feed: live listener for followed doctors ─────── */
+    var feedUnsub = null;
+    function startFeedListener() {
+      if (feedUnsub) { feedUnsub(); feedUnsub = null; }
+      if (!followingIds.length) { feedAppointments = []; return; }
+      // Firestore "in" query supports max 10 items
+      var ids = followingIds.slice(0, 10);
+      feedUnsub = db.collection("appointments")
+        .where("active","==",true)
+        .where("doctorId","in", ids)
+        .onSnapshot(function(snap){
+          feedAppointments = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+          if (currentView === "feed") {
+            var el = eid("feed-list");
+            if (el) { el.innerHTML = feedListHTML(); reBindFeedCards(); }
+          }
+        }, function(err){ console.error(err); });
+    }
+
     /* ── Auth ────────────────────────────────────────── */
     async function login() {
       try { await auth.signInWithPopup(provider); }
@@ -678,6 +960,7 @@
       myAppointment = null;
       myAllAppointments = [];
       activeTab = "my-session";
+      userWaitlessId = "";
       if (histUnsub) { histUnsub(); histUnsub = null; }
       go("home");
     }
@@ -779,11 +1062,49 @@
     }
 
     /* ── Actions ─────────────────────────────────────── */
+    // GPS reverse geocode using open-source Nominatim (no API key needed)
+    async function getLocationName() {
+      return new Promise(function(resolve) {
+        if (!navigator.geolocation) { resolve(""); return; }
+        var ls = eid("loc-status");
+        if (ls) { ls.textContent = "📍 Getting location…"; ls.style.color="var(--muted)"; }
+        navigator.geolocation.getCurrentPosition(
+          async function(pos) {
+            try {
+              var lat = pos.coords.latitude, lng = pos.coords.longitude;
+              var url = "https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json";
+              var res = await fetch(url, {headers:{"Accept-Language":"en"}});
+              var data = await res.json();
+              var addr = data.address || {};
+              // Build city/area string
+              var parts = [
+                addr.suburb || addr.neighbourhood || addr.village || "",
+                addr.city    || addr.town || addr.county || "",
+                addr.state   || ""
+              ].filter(Boolean);
+              var locName = parts.slice(0,2).join(", ");
+              if (ls) { ls.textContent = "✅ " + locName; ls.style.color="var(--green)"; }
+              resolve(locName);
+            } catch(e) {
+              if (ls) { ls.textContent = "❌ Could not get location"; ls.style.color="var(--red)"; }
+              resolve("");
+            }
+          },
+          function() {
+            if (ls) { ls.textContent = "❌ Location access denied"; ls.style.color="var(--red)"; }
+            resolve("");
+          },
+          { timeout: 8000 }
+        );
+      });
+    }
+
     async function createAppointment() {
-      var title  = val("f-title").trim();
-      var sched  = val("f-start");
-      var tokens = Math.min(Math.max(parseInt(val("f-tokens"))||20, 1), 500);
-      var notes  = val("f-notes").trim();
+      var title    = val("f-title").trim();
+      var sched    = val("f-start");
+      var tokens   = Math.min(Math.max(parseInt(val("f-tokens"))||20, 1), 500);
+      var notes    = val("f-notes").trim();
+      var location = val("f-location").trim();
       if (!title) { toast("Please enter a session title."); return; }
 
       var btn = eid("create-btn");
@@ -792,24 +1113,26 @@
 
       try {
         var created = await api("POST", "/api/appointments", {
-          title: title, startTime: sched, totalTokens: tokens, notes: notes
+          title: title, startTime: sched, totalTokens: tokens,
+          notes: notes, location: location,
+          doctorWaitlessId: userWaitlessId
         });
 
-        // Immediately populate myAppointment from the API response
-        // so the operating tab renders right away without waiting for Firestore
         myAppointment = {
-          id:           created.id,
-          doctorId:     currentUser.uid,
-          doctorName:   currentUser.displayName || "Doctor",
-          doctorPhoto:  currentUser.photoURL || "",
-          title:        title,
-          startTime:    sched,
-          totalTokens:  tokens,
-          currentToken: 1,
-          status:       "notstarted",
-          instruction:  "",
-          active:       true,
-          notes:        notes,
+          id:              created.id,
+          doctorId:        currentUser.uid,
+          doctorName:      currentUser.displayName || "Doctor",
+          doctorPhoto:     currentUser.photoURL || "",
+          doctorWaitlessId: userWaitlessId,
+          title:           title,
+          startTime:       sched,
+          totalTokens:     tokens,
+          currentToken:    1,
+          status:          "notstarted",
+          instruction:     "",
+          active:          true,
+          notes:           notes,
+          location:        location,
         };
 
         activeTab = "operating";
@@ -889,12 +1212,67 @@
       tick();
     }
 
+    // ── Token chime sound (Web Audio API — no external files needed) ────────────
+    // A warm, soft but loud bell chime: main tone + harmonic overtone + gentle fade
+    function playTokenChime() {
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function makeNote(freq, startTime, duration, gainPeak) {
+          // Oscillator — sine wave for softness
+          var osc = ctx.createOscillator();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, startTime);
+          // Slight frequency drop for warmth (like a real bell)
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.98, startTime + duration);
+
+          // Gain envelope — instant attack, long soft decay
+          var gain = ctx.createGain();
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(gainPeak, startTime + 0.01); // fast attack
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // soft decay
+
+          // Soft compressor so it's loud but never harsh
+          var comp = ctx.createDynamicsCompressor();
+          comp.threshold.value = -18;
+          comp.knee.value = 12;
+          comp.ratio.value = 3;
+          comp.attack.value = 0.003;
+          comp.release.value = 0.4;
+
+          osc.connect(gain);
+          gain.connect(comp);
+          comp.connect(ctx.destination);
+
+          osc.start(startTime);
+          osc.stop(startTime + duration);
+        }
+
+        var now = ctx.currentTime;
+
+        // Main chime tone — E5 (659Hz), very loud
+        makeNote(659, now,        1.8, 1.0);
+        // Harmonic overtone — B5 (988Hz), slightly quieter
+        makeNote(988, now,        1.4, 0.55);
+        // Second chime — G5 (784Hz), after a tiny gap, softer
+        makeNote(784, now + 0.18, 1.5, 0.65);
+        // Deep undertone — E4 (330Hz), adds warmth
+        makeNote(330, now,        1.2, 0.30);
+
+        // Auto close context after sound finishes
+        setTimeout(function(){ ctx.close(); }, 2200);
+      } catch(e) {
+        // Silently fail if browser blocks audio
+      }
+    }
+
     function nextToken() {
       if (!myAppointment || tokenCooldown) return;
       optimistic({
         currentToken: Math.min(myAppointment.currentToken + 1, myAppointment.totalTokens),
         status: "normal"
       });
+      playTokenChime();
       startTokenCooldown();
     }
 
@@ -903,6 +1281,7 @@
       optimistic({
         currentToken: Math.max(myAppointment.currentToken - 1, 1)
       });
+      playTokenChime();
       startTokenCooldown();
     }
 
@@ -990,9 +1369,12 @@
           </div>
           <div class="nav-actions">
             ${publicNote ? `<span class="nav-right-note">Live · No login needed</span>` : ""}
+            ${!back ? `<button class="btn-ghost nav-feed-btn" id="nav-feed">📋 Following</button>` : ""}
             ${currentUser ? `
-              <img src="${x(currentUser.photoURL||"")}" class="avatar" alt="" onerror="this.style.display='none'" />
-              <span class="nav-user">${x(currentUser.displayName||"Doctor")}</span>
+              <button class="nav-avatar-btn" id="nav-my-profile">
+                <img src="${x(currentUser.photoURL||"")}" class="avatar" alt="" onerror="this.style.display='none'" />
+              </button>
+              <span class="nav-wl-id" title="Your Waitless ID">${x(userWaitlessId)}</span>
               <button class="btn-ghost" id="nav-logout">Sign Out</button>
               ${!back ? `<button class="btn-primary" id="nav-panel">My Panel →</button>` : ""}
             ` : (!back ? `<button class="btn-google" id="nav-login">${googleSVG()} Sign in with Google</button>` : "")}
@@ -1013,6 +1395,13 @@
               <button class="btn-primary btn-lg" id="hero-view">View Live Tokens</button>
               ${!currentUser ? `<button class="btn-outline btn-lg" id="hero-login">Doctor Login</button>` : ""}
             </div>
+            ${currentUser && userWaitlessId ? `
+            <div class="wl-id-banner">
+              <span class="wl-id-label">Your Waitless ID</span>
+              <span class="wl-id-value">${x(userWaitlessId)}</span>
+              <button class="wl-id-copy" id="copy-wl-id" data-id="${x(userWaitlessId)}" title="Copy ID">📋 Copy</button>
+              <span class="wl-id-note">Share this ID so patients can find your clinic</span>
+            </div>` : ""}
           </header>
           ${previewSectionHTML()}
           <section class="features">
@@ -1110,7 +1499,7 @@
             </label>
             <label>
               Scheduled Time
-              <span style="font-size:12px;font-weight:400;color:var(--muted)">(shown to patients, optional)</span>
+              <span style="font-size:12px;font-weight:400;color:var(--muted)">(optional)</span>
               <input class="inp" id="f-start" type="time" />
             </label>
             <label>
@@ -1120,6 +1509,20 @@
             <label>
               Notes (optional)
               <input class="inp" id="f-notes" placeholder="e.g. Please bring your reports" />
+            </label>
+          </div>
+          <!-- Location field — full width -->
+          <div style="margin-bottom:20px">
+            <label>
+              Clinic Location
+              <span style="font-size:12px;font-weight:400;color:var(--muted)">(helps patients find you)</span>
+              <div class="loc-input-wrap">
+                <input class="inp" id="f-location" placeholder="e.g. Andheri West, Mumbai" />
+                <button class="btn-loc-gps" id="btn-loc-gps" type="button" title="Use current location">
+                  📍 Use My Location
+                </button>
+              </div>
+              <span class="loc-status" id="loc-status"></span>
             </label>
           </div>
           <button class="btn-primary btn-lg create-btn" id="create-btn">🚀 Start Appointment Session</button>
@@ -1438,38 +1841,83 @@
 
     /* ── PUBLIC BOARD ─────────────────────────────────── */
     function publicHTML() {
+      var hasAnyFilter = searchAptId.trim() || searchLocation.trim();
       return `
         <div class="public-board">
           ${navHTML({back:true, backLabel:"Home", publicNote:true})}
           <div class="board-body">
             <h2 class="board-title">Active Clinic Sessions</h2>
-            <div class="search-wrap">
-              <span class="search-icon-el">🔍</span>
-              <input class="search-inp" id="search-inp"
-                placeholder="Search by doctor name or clinic title…"
-                value="${x(searchQuery)}" />
-              <button class="search-clear ${searchQuery?"show":""}" id="search-clear">✕</button>
+
+            <!-- Search panel -->
+            <div class="pub-search-panel">
+
+              <!-- Appointment ID search (optional) -->
+              <div class="pub-search-row">
+                <div class="search-wrap" style="flex:1">
+                  <span class="search-icon-el">🆔</span>
+                  <input class="search-inp" id="search-apt-id"
+                    placeholder="Appointment ID (e.g. WL-48392) — optional"
+                    value="${x(searchAptId)}" />
+                  <button class="search-clear ${searchAptId?"show":""}" id="clear-apt-id">✕</button>
+                </div>
+              </div>
+
+              <!-- Location search -->
+              <div class="pub-search-row">
+                <div class="search-wrap" style="flex:1">
+                  <span class="search-icon-el">📍</span>
+                  <input class="search-inp" id="search-loc"
+                    placeholder="City or area (e.g. Andheri, Mumbai)"
+                    value="${x(searchLocation)}" />
+                  <button class="search-clear ${searchLocation?"show":""}" id="clear-loc">✕</button>
+                </div>
+                <button class="btn-gps-search" id="btn-gps-search" title="Use my current location">
+                  📍 Near Me
+                </button>
+              </div>
+
+              ${hasAnyFilter ? `
+              <button class="btn-clear-all" id="clear-all-search">✕ Clear all filters</button>` : ""}
             </div>
+
             <div id="board-grid">${pubCardsInner()}</div>
           </div>
         </div>`;
     }
 
     function filtered() {
-      if (!searchQuery.trim()) return allAppointments;
-      var q = searchQuery.toLowerCase();
-      return allAppointments.filter(function(a){
-        return (a.doctorName||"").toLowerCase().includes(q) ||
-               (a.title||"").toLowerCase().includes(q);
-      });
+      var list = allAppointments;
+
+      // Filter by location (city/area — case insensitive partial match)
+      if (searchLocation.trim()) {
+        var loc = searchLocation.toLowerCase().trim();
+        list = list.filter(function(a){
+          return (a.location||"").toLowerCase().includes(loc) ||
+                 (a.doctorName||"").toLowerCase().includes(loc) ||
+                 (a.title||"").toLowerCase().includes(loc);
+        });
+      }
+
+      // Filter by Appointment ID (matches doctor's WL- id)
+      if (searchAptId.trim()) {
+        var aid = searchAptId.toLowerCase().trim();
+        list = list.filter(function(a){
+          return (a.doctorWaitlessId||"").toLowerCase().includes(aid) ||
+                 (a.id||"").toLowerCase().includes(aid);
+        });
+      }
+
+      return list;
     }
 
     function pubCardsInner() {
       var list = filtered();
       if (!allAppointments.length)
         return `<div class="empty-state"><div class="empty-icon">🏥</div><p>No active sessions right now.</p><span>Check back later or ask your doctor.</span></div>`;
-      if (!list.length)
-        return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No results for "${x(searchQuery)}"</p><span>Try a different doctor name or clinic title.</span></div>`;
+      if (!list.length) {
+        var hint = searchAptId ? "Try a different Appointment ID." : searchLocation ? "Try a different city or area name." : "No clinics match your search.";
+        return `<div class="empty-state"><div class="empty-icon">🔍</div><p>No clinics found</p><span>${hint}</span></div>`;
+      }
       return `<div class="board-grid">${list.map(pubCardHTML).join("")}</div>`;
     }
 
@@ -1482,6 +1930,7 @@
             <div class="pub-info">
               <div class="pub-doctor">${x(apt.doctorName)}</div>
               <div class="pub-title-txt">${x(apt.title)}</div>
+              ${apt.location ? `<div class="pub-location">📍 ${x(apt.location)}</div>` : ""}
               <div class="pub-status-lbl" style="color:${m.color}">${m.icon} ${m.label}</div>
             </div>
             <div class="pub-token-badge">
@@ -1489,7 +1938,10 @@
               <div class="pub-token-l">${apt.status==="notstarted"?"Not Started":"Now Serving"}</div>
             </div>
           </div>
-          <div class="pub-card-foot">Tap to view details →</div>
+          <div class="pub-card-foot" style="display:flex;justify-content:space-between;align-items:center">
+            <span>Tap to view token →</span>
+            <button class="pub-view-profile" data-uid="${apt.doctorId}" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:0">👤 Profile</button>
+          </div>
         </div>`;
     }
 
@@ -1543,7 +1995,8 @@
               <span>${x(apt.instruction)}</span>
             </div>` : ""}
 
-          ${apt.startTime ? `<div class="live-meta">Scheduled for ${x(apt.startTime)}</div>` : ""}
+          ${apt.location  ? `<div class="live-meta">📍 ${x(apt.location)}</div>` : ""}
+          ${apt.startTime ? `<div class="live-meta">🕐 Scheduled for ${x(apt.startTime)}</div>` : ""}
 
           <div class="share-row">
             <button class="btn-share" id="btn-share"
@@ -1591,11 +2044,19 @@
     }
 
     function bindHome() {
-      on("nav-logout", logout);
-      on("nav-login",  login);
-      on("nav-panel",  function(){ go("doctor"); });
-      on("hero-view",  function(){ go("public"); });
-      on("hero-login", login);
+      on("nav-logout",      logout);
+      on("nav-login",       login);
+      on("nav-panel",       function(){ go("doctor"); });
+      on("nav-feed",        function(){ go("feed"); });
+      on("nav-my-profile",  function(){ if(currentUser) go("profile", myProfile||{uid:currentUser.uid}); else toast("Please log in to view your profile."); });
+      on("hero-view",       function(){ go("public"); });
+      on("hero-login",      login);
+      on("copy-wl-id", function(){
+        var btn = eid("copy-wl-id");
+        var id  = btn ? btn.dataset.id : userWaitlessId;
+        copyText(id);
+        toast("✅ Waitless ID copied: " + id);
+      });
       reBindClinicCards();
     }
     function reBindClinicCards() {
@@ -1607,6 +2068,8 @@
     function bindDoctor() {
       on("nav-back",       function(){ go("home"); });
       on("nav-logout",     logout);
+      on("nav-feed",       function(){ go("feed"); });
+      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
       on("tab-my-session", function(){ switchTab("my-session"); });
       on("tab-operating",  function(){ switchTab("operating"); });
       on("tab-history",    function(){ switchTab("history"); });
@@ -1634,6 +2097,17 @@
       on("create-btn",      createAppointment);
       on("btn-end-summary", endSession);
       on("btn-go-operate",  function(){ switchTab("operating"); });
+      // GPS button in create form
+      on("btn-loc-gps", async function(){
+        var btn = eid("btn-loc-gps");
+        if (btn) { btn.textContent = "📍 Locating…"; btn.disabled = true; }
+        var name = await getLocationName();
+        if (name) {
+          var inp = eid("f-location");
+          if (inp) inp.value = name;
+        }
+        if (btn) { btn.textContent = "📍 Use My Location"; btn.disabled = false; }
+      });
     }
 
     function bindOperatingContent() {
@@ -1652,38 +2126,128 @@
       if (ii) ii.addEventListener("keydown", function(e){ if(e.key==="Enter") sendInstruction(); });
     }
 
+    function refreshBoard() {
+      var bg = eid("board-grid");
+      if (bg) { bg.innerHTML = pubCardsInner(); reBindPubCards(); }
+    }
+
     function bindPublic() {
-      on("nav-back",    function(){ go("home"); });
-      on("nav-logout",  logout);
-      on("search-clear", function(){
-        searchQuery = "";
-        var si = eid("search-inp"); if(si) si.value = "";
-        var cl = eid("search-clear"); if(cl) cl.classList.remove("show");
-        var bg = eid("board-grid"); if(bg){ bg.innerHTML = pubCardsInner(); reBindPubCards(); }
-      });
-      var si = eid("search-inp");
-      if (si) {
-        si.addEventListener("input", function(){
-          searchQuery = si.value;
-          var cl = eid("search-clear"); if(cl) cl.classList.toggle("show", searchQuery.length > 0);
-          var bg = eid("board-grid"); if(bg){ bg.innerHTML = pubCardsInner(); reBindPubCards(); }
+      on("nav-back",       function(){ go("home"); });
+      on("nav-logout",     logout);
+      on("nav-feed",       function(){ go("feed"); });
+      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); else toast("Please log in to view your profile."); });
+
+      // Apt ID input
+      var aptIn = eid("search-apt-id");
+      if (aptIn) {
+        aptIn.addEventListener("input", function(){
+          searchAptId = aptIn.value;
+          var cl = eid("clear-apt-id"); if(cl) cl.classList.toggle("show", searchAptId.length>0);
+          refreshBoard();
         });
-        si.focus();
       }
+      on("clear-apt-id", function(){
+        searchAptId = "";
+        var el = eid("search-apt-id"); if(el) el.value = "";
+        var cl = eid("clear-apt-id"); if(cl) cl.classList.remove("show");
+        refreshBoard();
+      });
+
+      // Location input
+      var locIn = eid("search-loc");
+      if (locIn) {
+        locIn.addEventListener("input", function(){
+          searchLocation = locIn.value;
+          var cl = eid("clear-loc"); if(cl) cl.classList.toggle("show", searchLocation.length>0);
+          refreshBoard();
+        });
+      }
+      on("clear-loc", function(){
+        searchLocation = "";
+        var el = eid("search-loc"); if(el) el.value = "";
+        var cl = eid("clear-loc"); if(cl) cl.classList.remove("show");
+        refreshBoard();
+      });
+
+      // GPS "Near Me" button on public board
+      on("btn-gps-search", async function(){
+        var btn = eid("btn-gps-search");
+        if (btn) { btn.textContent = "📍 Locating…"; btn.disabled = true; }
+        try {
+          var locName = await getSearchLocationName();
+          if (locName) {
+            searchLocation = locName;
+            var el = eid("search-loc");
+            if (el) { el.value = locName; var cl = eid("clear-loc"); if(cl) cl.classList.add("show"); }
+            refreshBoard();
+            toast("📍 Showing clinics near " + locName);
+          } else {
+            toast("❌ Could not get your location");
+          }
+        } catch(e) {
+          toast("❌ Location error");
+        }
+        if (btn) { btn.textContent = "📍 Near Me"; btn.disabled = false; }
+      });
+
+      // Clear all
+      on("clear-all-search", function(){
+        searchAptId = ""; searchLocation = "";
+        var a = eid("search-apt-id"); if(a) a.value = "";
+        var l = eid("search-loc");    if(l) l.value = "";
+        document.querySelectorAll(".search-clear").forEach(function(c){ c.classList.remove("show"); });
+        refreshBoard();
+        paint(); // repaint to remove clear-all button
+      });
+
       reBindPubCards();
+    }
+
+    // GPS for public board search (Nominatim, no API key)
+    async function getSearchLocationName() {
+      return new Promise(function(resolve) {
+        if (!navigator.geolocation) { resolve(""); return; }
+        navigator.geolocation.getCurrentPosition(
+          async function(pos) {
+            try {
+              var lat = pos.coords.latitude, lng = pos.coords.longitude;
+              var url = "https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lng+"&format=json";
+              var res = await fetch(url, {headers:{"Accept-Language":"en"}});
+              var data = await res.json();
+              var addr = data.address || {};
+              var city = addr.city || addr.town || addr.county || addr.suburb || "";
+              resolve(city);
+            } catch(e) { resolve(""); }
+          },
+          function(){ resolve(""); },
+          {timeout:8000}
+        );
+      });
     }
     function reBindPubCards() {
       document.querySelectorAll(".pub-card[data-id]").forEach(function(c){
-        c.addEventListener("click", function(){
+        c.addEventListener("click", function(e){
+          // Don't navigate to live if profile button was clicked
+          if (e.target.classList.contains("pub-view-profile")) return;
           var found = allAppointments.find(function(a){ return a.id === c.dataset.id; });
           if (found) go("live", found);
+        });
+      });
+      document.querySelectorAll(".pub-view-profile[data-uid]").forEach(function(btn){
+        btn.addEventListener("click", async function(e){
+          e.stopPropagation();
+          var prof = await loadProfile(btn.dataset.uid);
+          if (prof) go("profile", prof);
+          else toast("Profile not found. Doctor hasn't set up a profile yet.");
         });
       });
     }
 
     function bindLive() {
-      on("nav-back",   function(){ go("public"); });
-      on("nav-logout", logout);
+      on("nav-back",       function(){ go("public"); });
+      on("nav-logout",     logout);
+      on("nav-feed",       function(){ go("feed"); });
+      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
       bindLiveButtons();
     }
     function bindLiveButtons() {
@@ -1733,21 +2297,347 @@
       </svg>`;
     }
 
+    /* ════════════════════════════════════════════════════
+       PROFILE PAGE (public view)
+    ════════════════════════════════════════════════════ */
+    function profileHTML() {
+      var prof      = viewingProfile || {};
+      var uid       = prof.uid || "";
+      var isMe      = currentUser && currentUser.uid === uid;
+      var following = isFollowing(uid);
+      var apts      = allAppointments.filter(function(a){ return a.doctorId === uid; });
+      var photo     = prof.photo || currentUser && isMe ? (currentUser.photoURL||"") : "";
+
+      return `
+        <div class="public-board">
+          ${navHTML({back:true, backLabel:"Back"})}
+          <div class="prof-body">
+
+            <!-- Cover + avatar -->
+            <div class="prof-cover">
+              <div class="prof-cover-bg"></div>
+              <div class="prof-avatar-wrap">
+                <img src="${x(photo||prof.photo||"")}" class="prof-avatar" alt=""
+                  onerror="this.src='';this.style.background='var(--bg3)'" />
+              </div>
+            </div>
+
+            <!-- Profile info -->
+            <div class="prof-info-card">
+              <div class="prof-info-top">
+                <div>
+                  <div class="prof-name">${x(prof.name||"User")}</div>
+                  ${prof.clinicName ? `<div class="prof-clinic">🏥 ${x(prof.clinicName)}</div>` : ""}
+                  ${prof.specialization ? `<div class="prof-spec">⚕️ ${x(prof.specialization)}</div>` : ""}
+                  ${prof.location ? `<div class="prof-loc-txt">📍 ${x(prof.location)}</div>` : ""}
+                  <div class="prof-wl-id">${x(prof.waitlessId||"")}</div>
+                </div>
+                <div class="prof-actions">
+                  ${isMe ? `
+                    <button class="btn-edit-profile" id="prof-edit">✏️ Edit Profile</button>
+                  ` : `
+                    <button class="btn-follow ${following?"btn-following":""}" id="prof-follow" data-uid="${x(uid)}">
+                      ${following ? "✅ Following" : "➕ Follow"}
+                    </button>
+                  `}
+                </div>
+              </div>
+              <div class="prof-stats">
+                <div class="prof-stat">
+                  <div class="prof-stat-val">${prof.followerCount||0}</div>
+                  <div class="prof-stat-lbl">Followers</div>
+                </div>
+                <div class="prof-stat">
+                  <div class="prof-stat-val">${apts.length}</div>
+                  <div class="prof-stat-lbl">Active Sessions</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active appointments section -->
+            <div class="prof-apts-section">
+              <div class="prof-section-title">
+                ${apts.length ? "🟢 Active Appointment Sessions" : "No active sessions right now"}
+              </div>
+              ${apts.length ? `
+                <div class="prof-apts-list">
+                  ${apts.map(function(apt){
+                    var m = STATUS[apt.status]||STATUS.normal;
+                    return `
+                      <div class="prof-apt-card" data-id="${apt.id}">
+                        <div class="prof-apt-left">
+                          <div class="prof-apt-title">${x(apt.title)}</div>
+                          <div class="prof-apt-meta">
+                            <span style="color:${m.color};font-weight:700">${m.icon} ${m.label}</span>
+                            ${apt.location ? ` · 📍 ${x(apt.location)}` : ""}
+                          </div>
+                        </div>
+                        <div class="prof-apt-token">
+                          <div class="prof-apt-num" style="color:${m.color}">${apt.status==="notstarted"?"—":apt.currentToken}</div>
+                          <div class="prof-apt-lbl">Token</div>
+                        </div>
+                      </div>`;
+                  }).join("")}
+                </div>
+              ` : `
+                <div class="prof-empty">
+                  <span>📭</span>
+                  <p>No active sessions right now.<br/>Follow to get notified when they go live.</p>
+                </div>
+              `}
+            </div>
+
+          </div>
+        </div>`;
+    }
+
+    function bindProfile() {
+      on("nav-back",    function(){ history.length>1 ? go(currentView==="profile"?"public":"home") : go("home"); });
+      on("nav-logout",  logout);
+      on("nav-feed",    function(){ go("feed"); });
+      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile||{uid:currentUser.uid}); });
+      on("prof-edit",   function(){ go("edit-profile"); });
+      var followBtn = eid("prof-follow");
+      if (followBtn) {
+        followBtn.addEventListener("click", function(){
+          var uid = followBtn.dataset.uid;
+          toggleFollow(uid);
+          startFeedListener();
+          // update button instantly
+          var nowFollowing = isFollowing(uid);
+          followBtn.textContent = nowFollowing ? "✅ Following" : "➕ Follow";
+          followBtn.classList.toggle("btn-following", nowFollowing);
+        });
+      }
+      // tap an appointment card to go live view
+      document.querySelectorAll(".prof-apt-card[data-id]").forEach(function(c){
+        c.addEventListener("click", function(){
+          var found = allAppointments.find(function(a){ return a.id===c.dataset.id; });
+          if (found) go("live", found);
+        });
+      });
+    }
+
+    /* ════════════════════════════════════════════════════
+       EDIT PROFILE PAGE
+    ════════════════════════════════════════════════════ */
+    function editProfileHTML() {
+      var prof = myProfile || {};
+      return `
+        <div class="public-board">
+          ${navHTML({back:true, backLabel:"Profile"})}
+          <div class="edit-prof-body">
+            <div class="edit-prof-heading">Edit Profile</div>
+            <div class="edit-prof-avatar-row">
+              <img src="${x(prof.photo||currentUser&&currentUser.photoURL||"")}" class="edit-prof-avatar" alt=""
+                onerror="this.style.background='var(--bg3)'" />
+              <div>
+                <div style="font-weight:600;font-size:15px">${x(prof.name||"")}</div>
+                <div style="font-size:13px;color:var(--muted)">Photo synced from Google</div>
+              </div>
+            </div>
+            <div class="edit-prof-form">
+              <label>
+                Display Name
+                <input class="inp" id="ep-name" value="${x(prof.name||"")}" placeholder="Your full name" />
+              </label>
+              <label>
+                Clinic Name
+                <input class="inp" id="ep-clinic" value="${x(prof.clinicName||"")}" placeholder="e.g. City Heart Clinic" />
+              </label>
+              <label>
+                Specialization
+                <input class="inp" id="ep-spec" value="${x(prof.specialization||"")}" placeholder="e.g. Cardiologist, Dentist, GP" />
+              </label>
+              <label>
+                Clinic Location
+                <div class="loc-input-wrap">
+                  <input class="inp" id="ep-location" value="${x(prof.location||"")}" placeholder="e.g. Andheri West, Mumbai" />
+                  <button class="btn-loc-gps" id="ep-loc-gps" type="button">📍 Use GPS</button>
+                </div>
+                <span class="loc-status" id="ep-loc-status"></span>
+              </label>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn-primary btn-lg" id="ep-save" style="flex:1">💾 Save Profile</button>
+              <button class="btn-outline" id="ep-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function bindEditProfile() {
+      on("nav-back",    function(){ go("profile", myProfile); });
+      on("nav-logout",  logout);
+      on("ep-cancel",   function(){ go("profile", myProfile); });
+      on("ep-loc-gps", async function(){
+        var btn = eid("ep-loc-gps");
+        var ls  = eid("ep-loc-status");
+        btn.disabled=true; btn.textContent="📍 Locating…";
+        if (ls) { ls.textContent="Getting location…"; ls.style.color="var(--muted)"; }
+        var name = await getLocationName(ls);
+        if (name) { var inp=eid("ep-location"); if(inp) inp.value=name; }
+        btn.disabled=false; btn.textContent="📍 Use GPS";
+      });
+      on("ep-save", async function(){
+        if (!currentUser) return;
+        var btn = eid("ep-save");
+        btn.disabled=true; btn.textContent="Saving…";
+        var data = {
+          name:           val("ep-name").trim()   || currentUser.displayName || "User",
+          photo:          currentUser.photoURL    || "",
+          clinicName:     val("ep-clinic").trim(),
+          specialization: val("ep-spec").trim(),
+          location:       val("ep-location").trim(),
+          waitlessId:     userWaitlessId,
+        };
+        try {
+          await saveMyProfile(data);
+          toast("✅ Profile saved!");
+          go("profile", myProfile);
+        } catch(e) {
+          toast("❌ " + e.message);
+          btn.disabled=false; btn.textContent="💾 Save Profile";
+        }
+      });
+    }
+
+    /* ════════════════════════════════════════════════════
+       FEED PAGE (followed doctors)
+    ════════════════════════════════════════════════════ */
+    function feedHTML() {
+      loadFollowing();
+      startFeedListener();
+      return `
+        <div class="public-board">
+          ${navHTML({back:true, backLabel:"Home"})}
+          <div class="feed-body">
+            <div class="feed-heading">📋 Following</div>
+            <div class="feed-sub">${followingIds.length} doctor${followingIds.length===1?"":"s"} followed · updates live</div>
+            <div id="feed-list">${feedListHTML()}</div>
+          </div>
+        </div>`;
+    }
+
+    function feedListHTML() {
+      if (!followingIds.length) {
+        return `
+          <div class="prof-empty" style="padding:60px 20px">
+            <span style="font-size:52px">👥</span>
+            <p>You're not following anyone yet.<br/>
+            Visit a doctor's profile and tap <strong>➕ Follow</strong>.</p>
+            <button class="btn-primary" id="feed-go-public" style="margin-top:16px">Browse Clinics</button>
+          </div>`;
+      }
+      // Show cards for all followed doctor IDs
+      return followingIds.map(function(uid){
+        var apts = feedAppointments.filter(function(a){ return a.doctorId===uid; });
+        return feedDoctorCardHTML(uid, apts);
+      }).join("");
+    }
+
+    function feedDoctorCardHTML(uid, apts) {
+      // Try to get profile info from active appointment data
+      var apt      = apts[0] || null;
+      var name     = apt ? apt.doctorName  : "Doctor";
+      var photo    = apt ? apt.doctorPhoto : "";
+      var hasLive  = apts.length > 0;
+      var m        = apt ? (STATUS[apt.status]||STATUS.normal) : null;
+
+      return `
+        <div class="feed-card" data-uid="${x(uid)}">
+          <div class="feed-card-top">
+            <img src="${x(photo)}" class="feed-avatar" alt=""
+              onerror="this.style.background='var(--bg3)';this.src=''" />
+            <div class="feed-card-info">
+              <div class="feed-doctor-name">${x(name)}</div>
+              <div class="feed-status ${hasLive?"feed-live":"feed-offline"}">
+                ${hasLive ? m.icon+" "+m.label : "⚫ No active session"}
+              </div>
+            </div>
+            <div class="feed-card-actions">
+              <button class="btn-ghost feed-view-profile" data-uid="${x(uid)}">👤 Profile</button>
+              <button class="btn-unfollow" data-uid="${x(uid)}">Unfollow</button>
+            </div>
+          </div>
+          ${hasLive ? `
+            <div class="feed-apts">
+              ${apts.map(function(a){
+                var mm = STATUS[a.status]||STATUS.normal;
+                return `
+                  <div class="feed-apt-row" data-id="${a.id}">
+                    <div class="feed-apt-title">${x(a.title)}</div>
+                    <div class="feed-apt-token" style="color:${mm.color}">
+                      ${a.status==="notstarted"?"—":a.currentToken}
+                    </div>
+                  </div>`;
+              }).join("")}
+            </div>
+          ` : ""}
+        </div>`;
+    }
+
+    function bindFeed() {
+      on("nav-back",       function(){ go("home"); });
+      on("nav-logout",     logout);
+      on("nav-feed",       function(){ go("feed"); });
+      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
+      on("feed-go-public", function(){ go("public"); });
+      reBindFeedCards();
+    }
+
+    function reBindFeedCards() {
+      // Unfollow buttons
+      document.querySelectorAll(".btn-unfollow[data-uid]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          toggleFollow(btn.dataset.uid);
+          startFeedListener();
+          var el = eid("feed-list");
+          if (el) { el.innerHTML = feedListHTML(); reBindFeedCards(); }
+        });
+      });
+      // View profile
+      document.querySelectorAll(".feed-view-profile[data-uid]").forEach(function(btn){
+        btn.addEventListener("click", async function(){
+          var prof = await loadProfile(btn.dataset.uid);
+          if (prof) go("profile", prof);
+          else toast("Profile not found");
+        });
+      });
+      // Tap appointment row
+      document.querySelectorAll(".feed-apt-row[data-id]").forEach(function(c){
+        c.addEventListener("click", function(){
+          var found = allAppointments.find(function(a){ return a.id===c.dataset.id; });
+          if (found) go("live", found);
+        });
+      });
+    }
+
+    /* ── Also add profile link to public board cards ─── */
+
     /* ── Boot ─────────────────────────────────────────── */
+    loadFollowing();  // load followed IDs from localStorage on startup
+    startFeedListener(); // start listening for feed appointments
     paint();
 
-    auth.onAuthStateChanged(function(user) {
+    auth.onAuthStateChanged(async function(user) {
       currentUser = user;
-      if (currentView === "splash") go("home");
-      else paint();
-      if (user) startDoctorWatch(user.uid);
-      else {
+      if (user) {
+        userWaitlessId = getOrCreateWaitlessId(user.uid);
+        await ensureMyProfile();
+        startDoctorWatch(user.uid);
+      } else {
+        userWaitlessId    = "";
+        myProfile         = null;
         if (aptUnsub)  { aptUnsub();  aptUnsub  = null; }
         if (histUnsub) { histUnsub(); histUnsub = null; }
-        myAppointment      = null;
-        myAllAppointments  = [];
-      histLoaded         = false;
+        if (feedUnsub) { feedUnsub(); feedUnsub = null; }
+        myAppointment     = null;
+        myAllAppointments = [];
+        histLoaded        = false;
       }
+      if (currentView === "splash") go("home");
+      else paint();
     });
 
   }); // end DOMContentLoaded
