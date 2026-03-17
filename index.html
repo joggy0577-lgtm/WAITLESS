@@ -646,7 +646,7 @@
 
     /* Info card */
     .prof-info-card { background:var(--bg2); border:1px solid var(--border); border-radius:0 0 var(--radius) var(--radius); padding:52px 20px 20px; margin-bottom:16px; }
-    .prof-info-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+    .prof-info-top { display:flex; flex-direction:column; gap:6px; margin-bottom:0; }
     .prof-name { font-family:var(--font-display); font-size:22px; font-weight:800; margin-bottom:4px; }
     .prof-clinic { font-size:14px; color:var(--text); font-weight:600; margin-bottom:2px; }
     .prof-spec { font-size:13px; color:var(--muted); margin-bottom:2px; }
@@ -657,12 +657,12 @@
     .prof-stat-lbl { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-top:2px; }
 
     /* Follow / Edit buttons */
-    .prof-actions { flex-shrink:0; }
-    .btn-follow { background:var(--green); color:#000; font-weight:800; padding:10px 20px; border-radius:10px; font-size:14px; border:none; cursor:pointer; transition:all .18s; }
+    .prof-actions { flex-shrink:0; display:flex; flex-direction:column; gap:10px; align-items:stretch; min-width:140px; }
+    .btn-follow { background:var(--green); color:#000; font-weight:800; padding:11px 20px; border-radius:10px; font-size:14px; border:none; cursor:pointer; transition:all .18s; text-align:center; }
     .btn-follow:hover { background:#00ff87; }
     .btn-following { background:var(--bg3); color:var(--text); border:1.5px solid var(--border); }
     .btn-following:hover { border-color:var(--red); color:var(--red); }
-    .btn-edit-profile { background:var(--bg3); color:var(--text); font-weight:600; padding:10px 18px; border-radius:10px; font-size:14px; border:1.5px solid var(--border); cursor:pointer; transition:all .18s; }
+    .btn-edit-profile { background:var(--bg3); color:var(--text); font-weight:600; padding:11px 18px; border-radius:10px; font-size:14px; border:1.5px solid var(--border); cursor:pointer; transition:all .18s; text-align:center; }
     .btn-edit-profile:hover { border-color:var(--green); color:var(--green); }
 
     /* Appointments section on profile */
@@ -774,12 +774,24 @@
     /* QR button on profile */
     .btn-qr-download {
       background:rgba(0,230,118,0.1); color:var(--green);
-      font-weight:700; padding:10px 18px; border-radius:10px;
+      font-weight:700; padding:11px 18px; border-radius:10px;
       font-size:14px; border:1.5px solid rgba(0,230,118,0.3);
       cursor:pointer; transition:all .18s; font-family:var(--font-body);
-      margin-top:8px; width:100%;
+      text-align:center; display:flex; align-items:center; justify-content:center; gap:6px;
     }
-    .btn-qr-download:hover { background:rgba(0,230,118,0.2); border-color:var(--green); }
+    .btn-qr-download:hover { background:rgba(0,230,118,0.2); border-color:var(--green); transform:translateY(-1px); }
+
+    /* Profile action buttons row */
+    .prof-btn-row {
+      display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;
+    }
+    .prof-btn-row button { flex:1; min-width:120px; }
+    .btn-follow { background:var(--green); color:#000; font-weight:800; padding:12px 16px; border-radius:10px; font-size:14px; border:none; cursor:pointer; transition:all .18s; font-family:var(--font-body); }
+    .btn-follow:hover { background:#00ff87; }
+    .btn-following { background:var(--bg3); color:var(--text); border:1.5px solid var(--border); }
+    .btn-following:hover { border-color:var(--red); color:var(--red); }
+    .btn-edit-profile { background:var(--bg3); color:var(--text); font-weight:600; padding:12px 16px; border-radius:10px; font-size:14px; border:1.5px solid var(--border); cursor:pointer; transition:all .18s; font-family:var(--font-body); }
+    .btn-edit-profile:hover { border-color:var(--green); color:var(--green); }
 
     /* ── SPLASH ── */
     .splash { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; gap:16px; }
@@ -869,10 +881,11 @@
     let feedAppointments  = [];   // live appointments from followed doctors
 
     const STATUS = {
-      normal:    { label:"Serving Patients", color:"#00e676", icon:"🟢", desc:"Queue running normally"   },
-      emergency: { label:"Emergency Stop",   color:"#ff1744", icon:"🔴", desc:"Pause queue immediately"  },
-      nopatient: { label:"No Patients",      color:"#ffd600", icon:"🟡", desc:"Queue is currently empty" },
-      break:     { label:"Break / Away",     color:"#40c4ff", icon:"🔵", desc:"Doctor stepped away"      },
+      notstarted: { label:"Waiting to Start", color:"#9e9e9e", icon:"⏳", desc:"Session not yet started"  },
+      normal:     { label:"Serving Patients", color:"#00e676", icon:"🟢", desc:"Queue running normally"   },
+      emergency:  { label:"Emergency Stop",   color:"#ff1744", icon:"🔴", desc:"Pause queue immediately"  },
+      nopatient:  { label:"No Patients",      color:"#ffd600", icon:"🟡", desc:"Queue is currently empty" },
+      break:      { label:"Break / Away",     color:"#40c4ff", icon:"🔵", desc:"Doctor stepped away"      },
     };
 
     /* ── Router ──────────────────────────────────────── */
@@ -1354,9 +1367,19 @@
       optimistic({ status: s });
     }
 
-    function startServing() {
+    async function startServing() {
       if (!myAppointment) return;
-      optimistic({ status: "normal" });
+      var btn = eid("op-start-serving");
+      if (btn) { btn.disabled = true; btn.textContent = "▶️ Starting…"; }
+      try {
+        await fsUpdate({ status: "normal" });
+        // Also update local state immediately for instant UI
+        myAppointment.status = "normal";
+        patchDoctorTabs();
+      } catch(e) {
+        toast("❌ Could not start: " + e.message);
+        if (btn) { btn.disabled = false; btn.textContent = "▶️ Start"; }
+      }
     }
 
     function toggleStop() {
@@ -2133,7 +2156,14 @@
       on("nav-login",       login);
       on("nav-panel",       function(){ go("doctor"); });
       on("nav-feed",        function(){ go("feed"); });
-      on("nav-my-profile",  function(){ if(currentUser) go("profile", myProfile||{uid:currentUser.uid}); else toast("Please log in to view your profile."); });
+      on("nav-my-profile",  function(){
+        if (currentUser) {
+          viewingProfile = myProfile || {uid:currentUser.uid};
+          go("profile", viewingProfile);
+        } else {
+          toast("Please log in to view your profile.");
+        }
+      });
       on("hero-view",       function(){ go("public"); });
       on("hero-login",      login);
       on("copy-wl-id", function(){
@@ -2154,7 +2184,7 @@
       on("nav-back",       function(){ go("home"); });
       on("nav-logout",     logout);
       on("nav-feed",       function(){ go("feed"); });
-      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
+      on("nav-my-profile", function(){ if(currentUser){ viewingProfile=myProfile||{uid:currentUser.uid}; go("profile",viewingProfile); } });
       on("tab-my-session", function(){ switchTab("my-session"); });
       on("tab-operating",  function(){ switchTab("operating"); });
       on("tab-history",    function(){ switchTab("history"); });
@@ -2241,7 +2271,7 @@
       on("nav-back",       function(){ go("home"); });
       on("nav-logout",     logout);
       on("nav-feed",       function(){ go("feed"); });
-      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); else toast("Please log in to view your profile."); });
+      on("nav-my-profile", function(){ if(currentUser){ viewingProfile=myProfile||{uid:currentUser.uid}; go("profile",viewingProfile); } });
 
       // Apt ID input
       var aptIn = eid("search-apt-id");
@@ -2353,7 +2383,7 @@
       on("nav-back",       function(){ go("public"); });
       on("nav-logout",     logout);
       on("nav-feed",       function(){ go("feed"); });
-      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
+      on("nav-my-profile", function(){ if(currentUser){ viewingProfile=myProfile||{uid:currentUser.uid}; go("profile",viewingProfile); } });
       bindLiveButtons();
     }
     function bindLiveButtons() {
@@ -2407,12 +2437,15 @@
        PROFILE PAGE (public view)
     ════════════════════════════════════════════════════ */
     function profileHTML() {
-      var prof      = viewingProfile || {};
-      var uid       = prof.uid || "";
-      var isMe      = currentUser && currentUser.uid === uid;
+      // If no viewingProfile set, fall back to myProfile (own profile)
+      var prof      = viewingProfile || myProfile || {};
+      var uid       = prof.uid || (currentUser ? currentUser.uid : "");
+      // isMe: true if logged-in user is viewing their own profile
+      var isMe      = !!(currentUser && uid && currentUser.uid === uid);
       var following = isFollowing(uid);
       var apts      = allAppointments.filter(function(a){ return a.doctorId === uid; });
-      var photo     = prof.photo || currentUser && isMe ? (currentUser.photoURL||"") : "";
+      // Use Google photo if viewing own profile, else stored photo
+      var photo     = isMe ? (currentUser.photoURL || prof.photo || "") : (prof.photo || "");
 
       return `
         <div class="public-board">
@@ -2423,35 +2456,49 @@
             <div class="prof-cover">
               <div class="prof-cover-bg"></div>
               <div class="prof-avatar-wrap">
-                <img src="${x(photo||prof.photo||"")}" class="prof-avatar" alt=""
+                <img src="${x(photo)}" class="prof-avatar" alt=""
                   onerror="this.src='';this.style.background='var(--bg3)'" />
               </div>
             </div>
 
-            <!-- Profile info -->
+            <!-- Profile info card -->
             <div class="prof-info-card">
               <div class="prof-info-top">
-                <div>
+                <div style="flex:1;min-width:0">
                   <div class="prof-name">${x(prof.name||"User")}</div>
-                  ${prof.clinicName ? `<div class="prof-clinic">🏥 ${x(prof.clinicName)}</div>` : ""}
-                  ${prof.specialization ? `<div class="prof-spec">⚕️ ${x(prof.specialization)}</div>` : ""}
-                  ${prof.location ? `<div class="prof-loc-txt">📍 ${x(prof.location)}</div>` : ""}
-                  <div class="prof-wl-id">${x(prof.waitlessId||"")}</div>
-                </div>
-                <div class="prof-actions">
-                  ${isMe ? `
-                    <button class="btn-edit-profile" id="prof-edit">✏️ Edit Profile</button>
-                    <button class="btn-qr-download" id="prof-qr" data-uid="${x(uid)}" data-name="${x(prof.name||"Doctor")}">
-                      📲 QR Code
-                    </button>
-                  ` : `
-                    <button class="btn-follow ${following?"btn-following":""}" id="prof-follow" data-uid="${x(uid)}">
-                      ${following ? "✅ Following" : "➕ Follow"}
-                    </button>
-                  `}
+                  ${prof.clinicName    ? `<div class="prof-clinic">🏥 ${x(prof.clinicName)}</div>`        : ""}
+                  ${prof.specialization?`<div class="prof-spec">⚕️ ${x(prof.specialization)}</div>`      : ""}
+                  ${prof.location     ? `<div class="prof-loc-txt">📍 ${x(prof.location)}</div>`         : ""}
+                  <div class="prof-wl-id">${x(prof.waitlessId||uid.slice(0,8)||"")}</div>
                 </div>
               </div>
-              <div class="prof-stats">
+
+              <!-- Action buttons — always shown as a full-width row below info -->
+              <div class="prof-btn-row">
+                ${isMe ? `
+                  <button class="btn-edit-profile" id="prof-edit" style="flex:1">✏️ Edit Profile</button>
+                  <button class="btn-qr-download"  id="prof-qr"
+                    data-uid="${x(uid)}"
+                    data-name="${x(prof.name||prof.clinicName||"Doctor")}"
+                    style="flex:1">
+                    📲 Download QR Code
+                  </button>
+                ` : `
+                  <button class="btn-follow ${following?"btn-following":""}" id="prof-follow"
+                    data-uid="${x(uid)}" style="flex:1">
+                    ${following ? "✅ Following" : "➕ Follow"}
+                  </button>
+                  <button class="btn-qr-download" id="prof-qr"
+                    data-uid="${x(uid)}"
+                    data-name="${x(prof.name||prof.clinicName||"Doctor")}"
+                    style="flex:1">
+                    📲 QR Code
+                  </button>
+                `}
+              </div>
+
+              <!-- Stats row -->
+              <div class="prof-stats" style="margin-top:16px">
                 <div class="prof-stat">
                   <div class="prof-stat-val">${prof.followerCount||0}</div>
                   <div class="prof-stat-lbl">Followers</div>
@@ -2463,7 +2510,7 @@
               </div>
             </div>
 
-            <!-- Active appointments section -->
+            <!-- Active appointments -->
             <div class="prof-apts-section">
               <div class="prof-section-title">
                 ${apts.length ? "🟢 Active Appointment Sessions" : "No active sessions right now"}
@@ -2491,7 +2538,7 @@
               ` : `
                 <div class="prof-empty">
                   <span>📭</span>
-                  <p>No active sessions right now.<br/>Follow to get notified when they go live.</p>
+                  <p>No active sessions right now.<br/>Follow to get updated when they go live.</p>
                 </div>
               `}
             </div>
@@ -2504,7 +2551,7 @@
       on("nav-back",    function(){ history.length>1 ? go(currentView==="profile"?"public":"home") : go("home"); });
       on("nav-logout",  logout);
       on("nav-feed",    function(){ go("feed"); });
-      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile||{uid:currentUser.uid}); });
+      on("nav-my-profile", function(){ if(currentUser){ viewingProfile=myProfile||{uid:currentUser.uid}; go("profile",viewingProfile); } });
       on("prof-edit",   function(){ go("edit-profile"); });
       // QR Code button — only on own profile
       var qrBtn = eid("prof-qr");
@@ -2697,7 +2744,7 @@
       on("nav-back",       function(){ go("home"); });
       on("nav-logout",     logout);
       on("nav-feed",       function(){ go("feed"); });
-      on("nav-my-profile", function(){ if(currentUser) go("profile", myProfile); });
+      on("nav-my-profile", function(){ if(currentUser){ viewingProfile=myProfile||{uid:currentUser.uid}; go("profile",viewingProfile); } });
       on("feed-go-public", function(){ go("public"); });
       reBindFeedCards();
     }
